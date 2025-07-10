@@ -6,7 +6,7 @@ const Index = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative"> {/* Added relative for positioning */}
+    <div className="flex flex-col items-center justify-center p-4 w-full"> {/* Removed min-h-screen and bg/text colors as Layout handles it */}
       {/* ThemeToggle is now in Layout, remove from here */}
 
       <div className="text-center mb-12">
