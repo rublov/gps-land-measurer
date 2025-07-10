@@ -23,7 +23,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom, mapT
       googleMap.current = new window.google.maps.Map(mapRef.current, {
         center: center,
         zoom: zoom,
-        mapTypeId: window.google.maps.MapTypeId[mapType.toUpperCase() as keyof typeof window.google.maps.MapTypeId], // Use mapType prop
+        mapTypeId: window.google.maps.MapTypeId[(mapType as string).toUpperCase() as keyof typeof window.google.maps.MapTypeId], // Use mapType prop, cast to string for .toUpperCase()
         disableDefaultUI: true, // Disable default UI for a cleaner look
         zoomControl: true,
         streetViewControl: false,

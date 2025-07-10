@@ -122,7 +122,7 @@ const MeasurementHistory = () => {
       ];
 
       const csvContent = [headers.join(','), data.join(',')].join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' } as BlobPropertyBag); // Cast to BlobPropertyBag
       const link = document.createElement('a');
       if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
@@ -225,7 +225,7 @@ const MeasurementHistory = () => {
       )}
 
       <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
-        <AlertDialogContent>
+        <DialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -236,7 +236,7 @@ const MeasurementHistory = () => {
             <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDelete}>Удалить</AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogContent>
+        </DialogContent>
       </AlertDialog>
 
       <Dialog open={isMapViewOpen} onOpenChange={setIsMapViewOpen}>
