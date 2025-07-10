@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Keep Link for potential internal links if needed, but remove 'Return to Home'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { loadSettings, saveSettings, AppSettings } from '@/utils/storage';
@@ -32,7 +32,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="flex flex-col items-center justify-center p-4 w-full"> {/* Removed min-h-screen and bg/text colors as Layout handles it */}
       <h1 className="text-3xl font-bold mb-6 text-center">{t('settings')}</h1>
       <div className="space-y-6 w-full max-w-sm">
         <div className="flex flex-col space-y-2">
@@ -72,9 +72,7 @@ const Settings = () => {
           </Select>
         </div>
       </div>
-      <Link to="/" className="mt-8">
-        <Button variant="outline">{t('returnToHome')}</Button>
-      </Link>
+      {/* Removed Link to home as sidebar handles navigation */}
       <MadeWithDyad />
     </div>
   );

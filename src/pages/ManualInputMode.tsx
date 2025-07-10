@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Keep Link for potential internal links if needed, but remove 'Return to Home'
 import { convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
 import { MadeWithDyad } from "@/components/made-with-dyad"; // Import MadeWithDyad
+import { Label } from "@/components/ui/label"; // Added import for Label
+import { Input } from "@/components/ui/input"; // Added import for Input
 
 const ManualInputMode = () => {
   const { t } = useTranslation();
@@ -90,7 +90,7 @@ const ManualInputMode = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="flex flex-col items-center justify-center p-4 w-full"> {/* Removed min-h-screen and bg/text colors as Layout handles it */}
       <h1 className="text-3xl font-bold mb-6 text-center">{t('manualInputMode')}</h1>
       <div className="space-y-6 w-full max-w-sm">
         <div>
@@ -127,9 +127,7 @@ const ManualInputMode = () => {
           {t('saveMeasurement')}
         </Button>
       </div>
-      <Link to="/" className="mt-8">
-        <Button variant="outline">{t('returnToHome')}</Button>
-      </Link>
+      {/* Removed Link to home as sidebar handles navigation */}
 
       <SaveMeasurementDialog
         isOpen={isSaveDialogOpen}

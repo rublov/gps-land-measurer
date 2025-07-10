@@ -2,6 +2,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout"; // Import the new Layout component
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import GpsMarkerMode from "./pages/GpsMarkerMode";
@@ -15,18 +16,19 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      {/* <Toaster /> - Removed as Sonner is used for all toasts */}
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/gps-marker-mode" element={<GpsMarkerMode />} />
-          <Route path="/walking-mode" element={<WalkingMode />} />
-          <Route path="/manual-input-mode" element={<ManualInputMode />} />
-          <Route path="/measurement-history" element={<MeasurementHistory />} />
-          <Route path="/settings" element={<Settings />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="/" element={<Layout />}> {/* Use Layout as the parent route */}
+            <Route index element={<Index />} /> {/* Index route for the main page */}
+            <Route path="gps-marker-mode" element={<GpsMarkerMode />} />
+            <Route path="walking-mode" element={<WalkingMode />} />
+            <Route path="manual-input-mode" element={<ManualInputMode />} />
+            <Route path="measurement-history" element={<MeasurementHistory />} />
+            <Route path="settings" element={<Settings />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

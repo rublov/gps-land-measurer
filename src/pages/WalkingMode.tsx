@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Keep Link for potential internal links if needed, but remove 'Return to Home'
 import MapComponent from '@/components/MapComponent';
 import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
@@ -26,7 +26,7 @@ const WalkingMode = () => {
   const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>(loadSettings().mapType); // Load initial map type
 
   const watchId = useRef<number | null>(null);
-  const lastRecordedLocation = useRef<LatLng | null>(null);
+  const lastRecordedLocation = useRef<LatLng | null>(null); // Corrected initialization
 
   const defaultCenter: LatLng = { lat: 55.7558, lng: 37.6173 }; // Moscow coordinates
 
@@ -153,7 +153,7 @@ const WalkingMode = () => {
   const mapMarkers = isMeasuring && currentLocation ? [...trackedPath, currentLocation] : trackedPath;
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="flex flex-col items-center p-4 w-full"> {/* Removed min-h-screen and bg/text colors as Layout handles it */}
       <h1 className="text-3xl font-bold mb-4 text-center">{t('walkingMode')}</h1>
       <p className="text-lg mb-4 text-center">
         {t('gpsAccuracy')}: {gpsAccuracy !== null ? `${gpsAccuracy.toFixed(1)} м` : '...'}
@@ -196,9 +196,7 @@ const WalkingMode = () => {
           {t('saveMeasurement')}
         </Button>
       </div>
-      <Link to="/" className="mt-8">
-        <Button variant="outline">{t('returnToHome')}</Button>
-      </Link>
+      {/* Removed Link to home as sidebar handles navigation */}
 
       <SaveMeasurementDialog
         isOpen={isSaveDialogOpen}
