@@ -8,6 +8,8 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { Trash2, FileText, FileSpreadsheet } from 'lucide-react'; // Icons for delete and export
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const MeasurementHistory = () => {
   const { t } = useTranslation();
@@ -35,15 +37,79 @@ const MeasurementHistory = () => {
     }
   };
 
-  // Placeholder for export functions
-  const handleExportPdf = (measurement: Measurement) => {
-    toast.info(`Экспорт "${measurement.name}" в PDF (не реализовано)`);
-    // Logic for PDF export would go here
+  const handleExportPdf = async (measurement: Measurement) => {
+    toast.info(`Генерация PDF для "${measurement.name}"...`);
+    try {
+      // Create a temporary div to render the content for PDF
+      const content = document.createElement('div');
+      content.style.padding = '20px';
+      content.style.fontFamily = 'Arial, sans-serif';
+      content.innerHTML = `
+        <h1 style="font-size: 24px; margin-bottom: 10px;">${t('appName')} - ${t('saveMeasurement')}</h1>
+        <p style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">${t('plotName')}: ${measurement.name}</p>
+        <p style="font-size: 16px; margin-bottom: 5px;">${t('area')}: ${measurement.areaSotkas.toFixed(2)} ${t('sotkas')} (${measurement.areaSqMeters.toFixed(2)} ${t('squareMeters')})</p>
+        <p style="font-size: 14px; color: #555;">${format(new Date(measurement.date), 'dd MMMM yyyy, HH:mm', { locale: ru })}</p>
+        <p style="font-size: 12px; color: #888; margin-top: 20px;">Примечание: Карта не включена в PDF-экспорт.</p>
+      `;
+      document.body.appendChild(content); // Temporarily add to DOM for html2canvas
+
+      const canvas = await html2canvas(content, { scale: 2 });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 190; // A4 width - 20mm margin
+      const pageHeight = pdf.internal.pageSize.height;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 10; // Initial position from top
+
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight + 10;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${measurement.name}_${format(new Date(measurement.date), 'yyyyMMdd')}.pdf`);
+      document.body.removeChild(content); // Remove temporary div
+      toast.success(t('exportToPdf') + ' ' + t('save') + '!');
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      toast.error(t('saveExportError'));
+    }
   };
 
   const handleExportExcel = (measurement: Measurement) => {
-    toast.info(`Экспорт "${measurement.name}" в Excel (не реализовано)`);
-    // Logic for Excel export would go here
+    try {
+      const headers = [t('plotName'), t('areaInSotkas'), t('areaInSqMeters'), t('date')];
+      const data = [
+        measurement.name,
+        measurement.areaSotkas.toFixed(2),
+        measurement.areaSqMeters.toFixed(2),
+        format(new Date(measurement.date), 'dd.MM.yyyy HH:mm', { locale: ru }),
+      ];
+
+      const csvContent = [headers.join(','), data.join(',')].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      if (link.download !== undefined) { // Feature detection for download attribute
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${measurement.name}_${format(new Date(measurement.date), 'yyyyMMdd')}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success(t('exportToExcel') + ' ' + t('save') + '!');
+      } else {
+        toast.error(t('saveExportError') + ': ' + 'Ваш браузер не поддерживает скачивание файлов.');
+      }
+    } catch (error) {
+      console.error("Error exporting Excel:", error);
+      toast.error(t('saveExportError'));
+    }
   };
 
   return (
