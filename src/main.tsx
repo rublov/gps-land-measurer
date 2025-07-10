@@ -17,13 +17,15 @@ const hideSplashScreen = () => {
   }
 };
 
+// Define the global initMap function for Google Maps API callback
+(window as any).initMap = () => {
+  console.log("Google Maps API loaded!");
+  hideSplashScreen();
+};
+
 // Render the React app
 createRoot(document.getElementById("root")!).render(
   <I18nextProvider i18n={i18n}>
     <App />
   </I18nextProvider>
 );
-
-// Call hideSplashScreen after a short delay to ensure React app has time to render
-// In a real app, this might be triggered by data loading completion
-setTimeout(hideSplashScreen, 1000); // Show splash for at least 1 second
