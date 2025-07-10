@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
+import { MadeWithDyad } from "@/components/made-with-dyad"; // Import MadeWithDyad
 
 const ManualInputMode = () => {
   const { t } = useTranslation();
@@ -136,6 +137,7 @@ const ManualInputMode = () => {
         areaSqMeters={calculatedSqMeters}
         areaSotkas={calculatedSotkas}
       />
+      <MadeWithDyad />
     </div>
   );
 };

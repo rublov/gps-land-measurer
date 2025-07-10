@@ -7,6 +7,7 @@ import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
 import { loadSettings } from '@/utils/storage'; // Import loadSettings
+import { MadeWithDyad } from "@/components/made-with-dyad"; // Import MadeWithDyad
 
 interface LatLng {
   lat: number;
@@ -167,6 +168,7 @@ const GpsMarkerMode = () => {
         coordinates={markers}
         onSaveSuccess={handleSaveSuccess}
       />
+      <MadeWithDyad />
     </div>
   );
 };

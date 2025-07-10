@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { loadSettings, saveSettings, AppSettings } from '@/utils/storage';
+import { MadeWithDyad } from "@/components/made-with-dyad"; // Import MadeWithDyad
 
 const Settings = () => {
   const { t, i18n } = useTranslation();
@@ -74,6 +75,7 @@ const Settings = () => {
       <Link to="/" className="mt-8">
         <Button variant="outline">{t('returnToHome')}</Button>
       </Link>
+      <MadeWithDyad />
     </div>
   );
 };

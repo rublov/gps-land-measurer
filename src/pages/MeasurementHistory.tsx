@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { MadeWithDyad } from "@/components/made-with-dyad"; // Import MadeWithDyad
 
 const MeasurementHistory = () => {
   const { t } = useTranslation();
@@ -219,6 +220,7 @@ const MeasurementHistory = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <MadeWithDyad />
     </div>
   );
 };
