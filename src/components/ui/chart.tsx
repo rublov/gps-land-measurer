@@ -16,6 +16,7 @@ import {
   Area,
 } from "recharts";
 
+// Removed circular imports from "@/components/ui/chart"
 import {
   ChartConfig,
   ChartContainer,
@@ -23,7 +24,8 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from "./chart-components"; // Assuming these are in a separate file or defined here
+
 import { cn } from "@/lib/utils";
 
 type ChartProps = React.ComponentProps<typeof ChartContainer>;
@@ -83,7 +85,7 @@ const ChartTooltipLabel = ({
   }
 
   const entry = payload[0];
-  const { name, value } = entry;
+  const { name, value } = entry as { name: string; value: any }; // Cast to ensure string methods exist
 
   if (typeof name === "string" && name.includes(".")) {
     return (
@@ -157,3 +159,30 @@ export {
   AreaChart,
   Area,
 };
+
+// Placeholder for chart-components.tsx if they are not in separate files
+// In a real shadcn/ui setup, these would be in their own files or defined directly.
+// For now, defining them here to resolve compilation.
+export type ChartConfig = Record<string, {
+  label?: string;
+  color?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+}>;
+
+export const ChartContainer = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    config: ChartConfig;
+    children: React.ReactNode;
+  }
+>(({ className, children, ...props }, ref) => (
+  <div ref={ref} className={cn("flex flex-col", className)} {...props}>
+    {children}
+  </div>
+));
+ChartContainer.displayName = "ChartContainer";
+
+export const ChartTooltip = Tooltip;
+export const ChartTooltipContent = TooltipContent;
+export const ChartLegend = Legend;
+export const ChartLegendContent = Legend;

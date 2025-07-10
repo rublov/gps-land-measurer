@@ -6,22 +6,20 @@ import { Separator } from '@/components/ui/separator';
 import { Home, MapPin, Footprints, Calculator, History, Settings as SettingsIcon, Menu, X } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { MadeWithDyad } from './made-with-dyad';
-import { useIsMobile } from '@/hooks/use-mobile'; // Import the hook
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Layout: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile); // Open by default on desktop, closed on mobile
-  const location = useLocation(); // To get current path
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
+  const location = useLocation();
 
-  // Close sidebar on mobile when route changes
   useEffect(() => {
     if (isMobile) {
       setIsSidebarOpen(false);
     }
   }, [location.pathname, isMobile]);
 
-  // Keep sidebar open on desktop if it was opened, close on mobile
   useEffect(() => {
     if (!isMobile) {
       setIsSidebarOpen(true);
@@ -35,7 +33,6 @@ const Layout: React.FC = () => {
     const activeClasses = "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90 dark:bg-sidebar-primary dark:text-sidebar-primary-foreground dark:hover:bg-sidebar-primary/90";
     const inactiveClasses = "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:text-sidebar-foreground dark:hover:bg-sidebar-accent dark:hover:text-sidebar-accent-foreground";
 
-    // Special handling for the root path
     const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
     return `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
@@ -43,7 +40,6 @@ const Layout: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {/* Mobile Menu Button */}
       {isMobile && (
         <Button
           variant="ghost"
@@ -56,7 +52,6 @@ const Layout: React.FC = () => {
         </Button>
       )}
 
-      {/* Sidebar */}
       <aside
         className={`
           ${isMobile ? 'fixed inset-y-0 left-0 z-[999] w-64 transform transition-transform ease-in-out duration-300' : 'relative w-64'}
@@ -113,7 +108,6 @@ const Layout: React.FC = () => {
         </div>
       </aside>
 
-      {/* Overlay for mobile when sidebar is open */}
       {isMobile && isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-[998] transition-opacity duration-300"
@@ -121,9 +115,8 @@ const Layout: React.FC = () => {
         ></div>
       )}
 
-      {/* Main Content Area */}
       <main className="flex-1 p-6 overflow-auto">
-        <Outlet /> {/* This is where the routed components will be rendered */}
+        <Outlet />
       </main>
     </div>
   );

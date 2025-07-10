@@ -45,7 +45,7 @@ const ManualInputMode = () => {
       return;
     }
 
-    setHectaresInput((numValue / 10000).toFixed(4)); // 1 hectare = 10000 m²
+    setHectaresInput((numValue / 10000).toFixed(4));
     convertAndSetSotkas(numValue);
   };
 
@@ -67,7 +67,7 @@ const ManualInputMode = () => {
       return;
     }
 
-    const sqM = numValue * 10000; // 1 hectare = 10000 m²
+    const sqM = numValue * 10000;
     setSqMetersInput(sqM.toFixed(2));
     convertAndSetSotkas(sqM);
   };

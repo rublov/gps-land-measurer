@@ -9,10 +9,10 @@ interface MapComponentProps {
   markers: LatLng[];
   center: LatLng;
   zoom: number;
-  mapType?: 'roadmap' | 'satellite' | 'hybrid' | 'terrain'; // Added mapType prop
+  mapType?: 'roadmap' | 'satellite' | 'hybrid' | 'terrain';
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom, mapType = 'hybrid' }) => { // Default to hybrid
+const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom, mapType = 'hybrid' }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMap = useRef<google.maps.Map | null>(null);
   const googleMarkers = useRef<google.maps.Marker[]>([]);
@@ -23,24 +23,22 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom, mapT
       googleMap.current = new window.google.maps.Map(mapRef.current, {
         center: center,
         zoom: zoom,
-        mapTypeId: window.google.maps.MapTypeId[(mapType as string).toUpperCase() as keyof typeof window.google.maps.MapTypeId], // Use mapType prop, cast to string for .toUpperCase()
-        disableDefaultUI: true, // Disable default UI for a cleaner look
+        mapTypeId: window.google.maps.MapTypeId[(mapType as string).toUpperCase() as keyof typeof window.google.maps.MapTypeId],
+        disableDefaultUI: true,
         zoomControl: true,
         streetViewControl: false,
         mapTypeControl: false,
         fullscreenControl: false,
       });
     }
-  }, [center, zoom, mapType]); // Added mapType to dependencies
+  }, [center, zoom, mapType]);
 
   useEffect(() => {
     if (!googleMap.current) return;
 
-    // Clear existing markers
     googleMarkers.current.forEach(marker => marker.setMap(null));
     googleMarkers.current = [];
 
-    // Add new markers
     markers.forEach((pos, index) => {
       const marker = new window.google.maps.Marker({
         position: pos,
@@ -50,15 +48,13 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom, mapT
       googleMarkers.current.push(marker);
     });
 
-    // Update or create polygon
     if (polygonRef.current) {
-      polygonRef.current.setMap(null); // Clear existing polygon
+      polygonRef.current.setMap(null);
     }
 
-    if (markers.length >= 2) { // Draw lines if at least 2 markers, polygon if 3+
+    if (markers.length >= 2) {
       const paths = markers.map(m => new window.google.maps.LatLng(m.lat, m.lng));
       if (markers.length >= 3) {
-        // Close the polygon
         paths.push(new window.google.maps.LatLng(markers[0].lat, markers[0].lng));
       }
 
@@ -73,16 +69,14 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom, mapT
       polygonRef.current.setMap(googleMap.current);
     }
 
-    // Adjust map bounds to fit all markers
     if (markers.length > 0) {
       const bounds = new window.google.maps.LatLngBounds();
       markers.forEach(marker => bounds.extend(marker));
       googleMap.current.fitBounds(bounds);
       if (markers.length === 1) {
-        googleMap.current.setZoom(18); // Zoom in for a single marker
+        googleMap.current.setZoom(18);
       }
     } else {
-      // If no markers, recenter to initial center
       googleMap.current.setCenter(center);
       googleMap.current.setZoom(zoom);
     }

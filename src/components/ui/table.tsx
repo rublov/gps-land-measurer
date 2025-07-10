@@ -90,7 +90,7 @@ const TableCell = React.forwardRef<
     className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
     {...props}
   />
-);
+)); // Added missing closing parenthesis
 TableCell.displayName = "TableCell";
 
 const TableCaption = React.forwardRef<
@@ -102,7 +102,7 @@ const TableCaption = React.forwardRef<
     className={cn("mt-4 text-sm text-muted-foreground", className)}
     {...props}
   />
-);
+)); // Added missing closing parenthesis
 TableCaption.displayName = "TableCaption";
 
 export {

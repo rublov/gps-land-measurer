@@ -41,7 +41,7 @@ const SaveMeasurementDialog: React.FC<SaveMeasurementDialogProps> = ({
     }
 
     const newMeasurement: Measurement = {
-      id: Date.now().toString(), // Simple unique ID
+      id: Date.now().toString(),
       name: plotName.trim(),
       areaSqMeters: parseFloat(areaSqMeters.toFixed(2)),
       areaSotkas: parseFloat(areaSotkas.toFixed(2)),

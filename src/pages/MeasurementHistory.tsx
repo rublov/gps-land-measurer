@@ -76,8 +76,7 @@ const MeasurementHistory = () => {
       content.style.fontFamily = 'Arial, sans-serif';
       content.innerHTML = `
         <h1 style="font-size: 24px; margin-bottom: 10px;">${t('appName')} - ${t('saveMeasurement')}</h1>
-        <p style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">${t('plotName')}: ${measurement.name}</p>
-        <p style="font-size: 16px; margin-bottom: 5px;">${measurement.areaSotkas.toFixed(2)} ${t('sotkas')} (${measurement.areaSqMeters.toFixed(2)} ${t('squareMeters')})</p>
+        <p style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">${measurement.areaSotkas.toFixed(2)} ${t('sotkas')} (${measurement.areaSqMeters.toFixed(2)} ${t('squareMeters')})</p>
         <p style="font-size: 14px; color: #555;">${format(new Date(measurement.date), 'dd MMMM yyyy, HH:mm', { locale: ru })}</p>
         <p style="font-size: 12px; color: #888; margin-top: 20px;">Примечание: Карта не включена в PDF-экспорт.</p>
       `;
@@ -122,7 +121,7 @@ const MeasurementHistory = () => {
       ];
 
       const csvContent = [headers.join(','), data.join(',')].join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' } as BlobPropertyBag); // Cast to BlobPropertyBag
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' } as BlobPropertyBag);
       const link = document.createElement('a');
       if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);

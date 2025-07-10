@@ -14,7 +14,7 @@ type CarouselContextProps = {
   scrollNext: () => void;
   canScrollPrev: boolean;
   canScrollNext: boolean;
-} & React.ComponentPropsWithoutRef<typeof EmblaCarousel>;
+} & React.ComponentPropsWithoutRef<typeof Carousel>; // Corrected type reference
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 
@@ -226,7 +226,6 @@ export {
   CarouselPrevious,
 };
 
-// Helper for CarouselContent, assuming it's a simple div wrapper
 const CarouselContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
