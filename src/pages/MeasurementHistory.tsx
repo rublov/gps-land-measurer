@@ -26,6 +26,9 @@ const MeasurementHistory = () => {
   const { t } = useTranslation();
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [isClearAllConfirmOpen, setIsClearAllConfirmOpen] = useState<boolean>(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
+  const [measurementToDelete, setMeasurementToDelete] = useState<string | null>(null);
+
 
   const fetchMeasurements = () => {
     setMeasurements(loadMeasurements());
@@ -35,10 +38,19 @@ const MeasurementHistory = () => {
     fetchMeasurements();
   }, []);
 
-  const handleDelete = (id: string) => {
-    deleteMeasurement(id);
-    fetchMeasurements(); // Refresh the list
-    toast.success(t('deleteMeasurement') + '!');
+  const handleDeleteClick = (id: string) => {
+    setMeasurementToDelete(id);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (measurementToDelete) {
+      deleteMeasurement(measurementToDelete);
+      fetchMeasurements(); // Refresh the list
+      toast.success(t('deleteMeasurement') + '!');
+      setMeasurementToDelete(null);
+      setIsDeleteConfirmOpen(false);
+    }
   };
 
   const handleClearAll = () => {
@@ -138,7 +150,7 @@ const MeasurementHistory = () => {
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                   <span>{m.name}</span>
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(m.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(m.id)}>
                     <Trash2 className="h-5 w-5 text-red-500" />
                   </Button>
                 </CardTitle>
@@ -186,6 +198,22 @@ const MeasurementHistory = () => {
       <Link to="/" className="mt-8 mb-4">
         <Button variant="outline">{t('returnToHome')}</Button>
       </Link>
+
+      {/* AlertDialog for individual measurement deletion */}
+      <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Это действие безвозвратно удалит выбранное измерение.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete}>Удалить</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
