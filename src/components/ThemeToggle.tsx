@@ -24,7 +24,13 @@ const ThemeToggle: React.FC = () => {
   };
 
   return (
-    <Button variant="ghost" size="icon" onClick={toggleTheme} className="absolute top-4 right-4">
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleTheme}
+      className="absolute top-4 right-4"
+      aria-label={theme === 'dark' ? 'Toggle light mode' : 'Toggle dark mode'}
+    >
       {theme === 'dark' ? (
         <Sun className="h-6 w-6 text-yellow-400" />
       ) : (

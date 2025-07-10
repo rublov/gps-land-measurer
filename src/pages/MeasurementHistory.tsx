@@ -150,7 +150,12 @@ const MeasurementHistory = () => {
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                   <span>{m.name}</span>
-                  <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(m.id)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteClick(m.id)}
+                    aria-label={`Удалить измерение ${m.name}`} // Added aria-label
+                  >
                     <Trash2 className="h-5 w-5 text-red-500" />
                   </Button>
                 </CardTitle>
@@ -163,10 +168,10 @@ const MeasurementHistory = () => {
                   {format(new Date(m.date), 'dd MMMM yyyy, HH:mm', { locale: ru })}
                 </p>
                 <div className="flex space-x-2 mt-4">
-                  <Button variant="outline" size="sm" onClick={() => handleExportPdf(m)}>
+                  <Button variant="outline" size="sm" onClick={() => handleExportPdf(m)} aria-label={`Экспорт ${m.name} в PDF`}>
                     <FileText className="h-4 w-4 mr-2" /> {t('exportToPdf')}
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleExportExcel(m)}>
+                  <Button variant="outline" size="sm" onClick={() => handleExportExcel(m)} aria-label={`Экспорт ${m.name} в Excel`}>
                     <FileSpreadsheet className="h-4 w-4 mr-2" /> {t('exportToExcel')}
                   </Button>
                 </div>
