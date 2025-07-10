@@ -12,7 +12,7 @@ const Layout: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile); // Open by default on desktop, closed on mobile
-  const location = useLocation(); // To close sidebar on navigation
+  const location = useLocation(); // To get current path
 
   // Close sidebar on mobile when route changes
   useEffect(() => {
@@ -29,6 +29,17 @@ const Layout: React.FC = () => {
       setIsSidebarOpen(false);
     }
   }, [isMobile]);
+
+  const getLinkClasses = (path: string) => {
+    const baseClasses = "w-full justify-start text-lg";
+    const activeClasses = "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90 dark:bg-sidebar-primary dark:text-sidebar-primary-foreground dark:hover:bg-sidebar-primary/90";
+    const inactiveClasses = "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:text-sidebar-foreground dark:hover:bg-sidebar-accent dark:hover:text-sidebar-accent-foreground";
+
+    // Special handling for the root path
+    const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+
+    return `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
@@ -61,37 +72,37 @@ const Layout: React.FC = () => {
         <Separator className="mb-6 bg-sidebar-border dark:bg-sidebar-border" />
         <nav className="flex-grow space-y-2">
           <Link to="/" className="block">
-            <Button variant="ghost" className="w-full justify-start text-lg text-sidebar-foreground dark:text-sidebar-foreground hover:bg-sidebar-accent dark:hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:hover:text-sidebar-accent-foreground">
+            <Button variant="ghost" className={getLinkClasses('/')}>
               <Home className="mr-3 h-5 w-5" />
               {t('home')}
             </Button>
           </Link>
           <Link to="/gps-marker-mode" className="block">
-            <Button variant="ghost" className="w-full justify-start text-lg text-sidebar-foreground dark:text-sidebar-foreground hover:bg-sidebar-accent dark:hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:hover:text-sidebar-accent-foreground">
+            <Button variant="ghost" className={getLinkClasses('/gps-marker-mode')}>
               <MapPin className="mr-3 h-5 w-5" />
               {t('gpsMarkerMode')}
             </Button>
           </Link>
           <Link to="/walking-mode" className="block">
-            <Button variant="ghost" className="w-full justify-start text-lg text-sidebar-foreground dark:text-sidebar-foreground hover:bg-sidebar-accent dark:hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:hover:text-sidebar-accent-foreground">
+            <Button variant="ghost" className={getLinkClasses('/walking-mode')}>
               <Footprints className="mr-3 h-5 w-5" />
               {t('walkingMode')}
             </Button>
           </Link>
           <Link to="/manual-input-mode" className="block">
-            <Button variant="ghost" className="w-full justify-start text-lg text-sidebar-foreground dark:text-sidebar-foreground hover:bg-sidebar-accent dark:hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:hover:text-sidebar-accent-foreground">
+            <Button variant="ghost" className={getLinkClasses('/manual-input-mode')}>
               <Calculator className="mr-3 h-5 w-5" />
               {t('manualInputMode')}
             </Button>
           </Link>
           <Link to="/measurement-history" className="block">
-            <Button variant="ghost" className="w-full justify-start text-lg text-sidebar-foreground dark:text-sidebar-foreground hover:bg-sidebar-accent dark:hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:hover:text-sidebar-accent-foreground">
+            <Button variant="ghost" className={getLinkClasses('/measurement-history')}>
               <History className="mr-3 h-5 w-5" />
               {t('measurementHistory')}
             </Button>
           </Link>
           <Link to="/settings" className="block">
-            <Button variant="ghost" className="w-full justify-start text-lg text-sidebar-foreground dark:text-sidebar-foreground hover:bg-sidebar-accent dark:hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:hover:text-sidebar-accent-foreground">
+            <Button variant="ghost" className={getLinkClasses('/settings')}>
               <SettingsIcon className="mr-3 h-5 w-5" />
               {t('settings')}
             </Button>
