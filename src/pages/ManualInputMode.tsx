@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom'; // Keep Link for potential internal links if needed, but remove 'Return to Home'
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Link } from 'react-router-dom';
 import { convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
-import { MadeWithDyad } from "@/components/made-with-dyad"; // Import MadeWithDyad
-import { Label } from "@/components/ui/label"; // Added import for Label
-import { Input } from "@/components/ui/input"; // Added import for Input
+// import { MadeWithDyad } from "@/components/made-with-dyad"; // Removed MadeWithDyad
 
 const ManualInputMode = () => {
   const { t } = useTranslation();
@@ -135,7 +135,7 @@ const ManualInputMode = () => {
         areaSqMeters={calculatedSqMeters}
         areaSotkas={calculatedSotkas}
       />
-      <MadeWithDyad />
+      {/* MadeWithDyad is now in Layout, remove from here */}
     </div>
   );
 };

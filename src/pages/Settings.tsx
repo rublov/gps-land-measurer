@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'; // Keep Link for potential internal lin
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { loadSettings, saveSettings, AppSettings } from '@/utils/storage';
-import { MadeWithDyad } from "@/components/made-with-dyad"; // Import MadeWithDyad
+// import { MadeWithDyad } from "@/components/made-with-dyad"; // Removed MadeWithDyad
 
 const Settings = () => {
   const { t, i18n } = useTranslation();
@@ -73,7 +73,7 @@ const Settings = () => {
         </div>
       </div>
       {/* Removed Link to home as sidebar handles navigation */}
-      <MadeWithDyad />
+      {/* MadeWithDyad is now in Layout, remove from here */}
     </div>
   );
 };

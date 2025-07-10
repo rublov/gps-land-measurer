@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { MadeWithDyad } from "@/components/made-with-dyad"; // Import MadeWithDyad
+// import { MadeWithDyad } from "@/components/made-with-dyad"; // Removed MadeWithDyad
 
 const MeasurementHistory = () => {
   const { t } = useTranslation();

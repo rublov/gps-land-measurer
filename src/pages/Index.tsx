@@ -1,8 +1,6 @@
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import ThemeToggle from "@/components/ThemeToggle"; // Import ThemeToggle
 
 const Index = () => {
   const { t } = useTranslation();

@@ -7,7 +7,7 @@ import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
 import { loadSettings } from '@/utils/storage'; // Import loadSettings
-import { MadeWithDyad } from "@/components/made-with-dyad"; // Import MadeWithDyad
+// import { MadeWithDyad } from "@/components/made-with-dyad"; // Removed MadeWithDyad
 
 interface LatLng {
   lat: number;
@@ -206,7 +206,7 @@ const WalkingMode = () => {
         coordinates={trackedPath}
         onSaveSuccess={handleSaveSuccess}
       />
-      <MadeWithDyad />
+      {/* MadeWithDyad is now in Layout, remove from here */}
     </div>
   );
 };
