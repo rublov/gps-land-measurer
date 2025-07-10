@@ -16,31 +16,34 @@ import {
   Area,
 } from "recharts";
 
-// Removed circular imports from "@/components/ui/chart"
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "./chart-components"; // Assuming these are in a separate file or defined here
-
 import { cn } from "@/lib/utils";
+import { TooltipContent } from "@/components/ui/tooltip"; // Import TooltipContent from its actual file
 
-type ChartProps = React.ComponentProps<typeof ChartContainer>;
+// Define ChartConfig and ChartContainer directly in this file
+export type ChartConfig = Record<string, {
+  label?: string;
+  color?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+}>;
 
-type ChartPrimitiveProps =
-  | React.ComponentProps<typeof LineChart>
-  | React.ComponentProps<typeof BarChart>
-  | React.ComponentProps<typeof AreaChart>
-  | React.ComponentProps<typeof PieChart>;
+export const ChartContainer = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    config: ChartConfig;
+    children: React.ReactNode;
+  }
+>(({ className, children, ...props }, ref) => (
+  <div ref={ref} className={cn("flex flex-col", className)} {...props}>
+    {children}
+  </div>
+));
+ChartContainer.displayName = "ChartContainer";
 
-type ChartPrimitiveElement =
-  | React.ElementRef<typeof LineChart>
-  | React.ElementRef<typeof BarChart>
-  | React.ElementRef<typeof AreaChart>
-  | React.ElementRef<typeof PieChart>;
+export const ChartTooltip = Tooltip; // Re-export Tooltip from recharts
+export const ChartTooltipContent = TooltipContent; // Use the imported TooltipContent
+export const ChartLegend = Legend; // Re-export Legend from recharts
+export const ChartLegendContent = Legend; // Re-export Legend from recharts
+
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 
@@ -60,13 +63,14 @@ type ChartContextProps = {
 
 const Chart = React.forwardRef<
   HTMLDivElement,
-  ChartProps & { config: ChartConfig }
+  React.ComponentProps<typeof ChartContainer> & { config: ChartConfig } // Corrected type to use ChartContainerProps
 >(({ config, className, children, ...props }, ref) => {
   return (
     <ChartContext.Provider value={{ config }}>
       <ChartContainer
         ref={ref}
         className={cn("min-h-[200px] w-full", className)}
+        config={config} // Pass config prop to ChartContainer
         {...props}
       >
         {children}
@@ -85,7 +89,7 @@ const ChartTooltipLabel = ({
   }
 
   const entry = payload[0];
-  const { name, value } = entry as { name: string; value: any }; // Cast to ensure string methods exist
+  const { name, value } = entry as { name: string; value: any };
 
   if (typeof name === "string" && name.includes(".")) {
     return (
@@ -159,30 +163,3 @@ export {
   AreaChart,
   Area,
 };
-
-// Placeholder for chart-components.tsx if they are not in separate files
-// In a real shadcn/ui setup, these would be in their own files or defined directly.
-// For now, defining them here to resolve compilation.
-export type ChartConfig = Record<string, {
-  label?: string;
-  color?: string;
-  icon?: React.ComponentType<{ className?: string }>;
-}>;
-
-export const ChartContainer = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
-    config: ChartConfig;
-    children: React.ReactNode;
-  }
->(({ className, children, ...props }, ref) => (
-  <div ref={ref} className={cn("flex flex-col", className)} {...props}>
-    {children}
-  </div>
-));
-ChartContainer.displayName = "ChartContainer";
-
-export const ChartTooltip = Tooltip;
-export const ChartTooltipContent = TooltipContent;
-export const ChartLegend = Legend;
-export const ChartLegendContent = Legend;

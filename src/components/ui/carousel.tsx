@@ -14,7 +14,7 @@ type CarouselContextProps = {
   scrollNext: () => void;
   canScrollPrev: boolean;
   canScrollNext: boolean;
-} & React.ComponentPropsWithoutRef<typeof Carousel>; // Corrected type reference
+} & React.ComponentPropsWithoutRef<typeof Carousel>;
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 
