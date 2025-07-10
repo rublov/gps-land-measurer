@@ -1,12 +1,80 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
+import { convertSqMetersToSotkas } from '@/utils/geometry';
+import { toast } from 'sonner';
 
 const ManualInputMode = () => {
   const { t } = useTranslation();
+  const [sqMetersInput, setSqMetersInput] = useState<string>('');
+  const [hectaresInput, setHectaresInput] = useState<string>('');
+  const [calculatedSotkas, setCalculatedSotkas] = useState<number>(0);
+
+  const convertAndSetSotkas = (sqM: number) => {
+    if (isNaN(sqM) || sqM < 0) {
+      setCalculatedSotkas(0);
+      return;
+    }
+    setCalculatedSotkas(convertSqMetersToSotkas(sqM));
+  };
+
+  const handleSqMetersChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSqMetersInput(value);
+    const numValue = parseFloat(value);
+
+    if (value === '' || isNaN(numValue)) {
+      setHectaresInput('');
+      convertAndSetSotkas(0);
+      return;
+    }
+
+    if (numValue < 0) {
+      toast.error(t('invalidInput'));
+      setHectaresInput('');
+      convertAndSetSotkas(0);
+      return;
+    }
+
+    setHectaresInput((numValue / 10000).toFixed(4)); // 1 hectare = 10000 m²
+    convertAndSetSotkas(numValue);
+  };
+
+  const handleHectaresChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setHectaresInput(value);
+    const numValue = parseFloat(value);
+
+    if (value === '' || isNaN(numValue)) {
+      setSqMetersInput('');
+      convertAndSetSotkas(0);
+      return;
+    }
+
+    if (numValue < 0) {
+      toast.error(t('invalidInput'));
+      setSqMetersInput('');
+      convertAndSetSotkas(0);
+      return;
+    }
+
+    const sqM = numValue * 10000; // 1 hectare = 10000 m²
+    setSqMetersInput(sqM.toFixed(2));
+    convertAndSetSotkas(sqM);
+  };
+
+  // No explicit "Calculate" button needed as conversions happen in real-time
+  // The button can remain for consistency or be removed if not needed for other actions.
+  const handleCalculate = () => {
+    // This function can be used for future "Save" functionality or other actions
+    // For now, conversions are real-time.
+    if (sqMetersInput === '' && hectaresInput === '') {
+      toast.warning(t('invalidInput'));
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
@@ -14,17 +82,37 @@ const ManualInputMode = () => {
       <div className="space-y-6 w-full max-w-sm">
         <div>
           <Label htmlFor="sqMeters">{t('areaInSqMeters')}</Label>
-          <Input id="sqMeters" type="number" placeholder="0" className="mt-1" />
+          <Input
+            id="sqMeters"
+            type="number"
+            placeholder="0"
+            className="mt-1"
+            value={sqMetersInput}
+            onChange={handleSqMetersChange}
+            min="0"
+          />
         </div>
         <div>
           <Label htmlFor="hectares">{t('areaInHectares')}</Label>
-          <Input id="hectares" type="number" placeholder="0" className="mt-1" />
+          <Input
+            id="hectares"
+            type="number"
+            placeholder="0"
+            className="mt-1"
+            value={hectaresInput}
+            onChange={handleHectaresChange}
+            min="0"
+          />
         </div>
         <div className="flex flex-col items-center">
           <Label className="text-lg font-semibold">{t('areaInSotkas')}:</Label>
-          <span className="text-2xl font-bold mt-2">0 {t('sotkas')}</span>
+          <span className="text-2xl font-bold mt-2">
+            {calculatedSotkas.toFixed(2)} {t('sotkas')}
+          </span>
         </div>
-        <Button className="w-full">{t('calculate')}</Button>
+        <Button className="w-full" onClick={handleCalculate}>
+          {t('calculate')}
+        </Button>
       </div>
       <Link to="/" className="mt-8">
         <Button variant="outline">{t('returnToHome')}</Button>
