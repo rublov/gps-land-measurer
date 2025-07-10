@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom'; // Keep Link for potential internal links if needed, but remove 'Return to Home'
-import { loadMeasurements, deleteMeasurement, clearAllMeasurements, Measurement } from '@/utils/storage';
+import { Link } from 'react-router-dom';
+import { loadMeasurements, deleteMeasurement, clearAllMeasurements, Measurement, loadSettings } from '@/utils/storage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { Trash2, FileText, FileSpreadsheet } from 'lucide-react'; // Icons for delete and export
+import { Trash2, FileText, FileSpreadsheet, Map } from 'lucide-react'; // Added Map icon
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import {
@@ -21,7 +21,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-// import { MadeWithDyad } from "@/components/made-with-dyad"; // Removed MadeWithDyad
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"; // Import Dialog components
+import MapComponent from '@/components/MapComponent'; // Import MapComponent
 
 const MeasurementHistory = () => {
   const { t } = useTranslation();
@@ -29,7 +35,8 @@ const MeasurementHistory = () => {
   const [isClearAllConfirmOpen, setIsClearAllConfirmOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
   const [measurementToDelete, setMeasurementToDelete] = useState<string | null>(null);
-
+  const [isMapViewOpen, setIsMapViewOpen] = useState<boolean>(false);
+  const [selectedMeasurement, setSelectedMeasurement] = useState<Measurement | null>(null);
 
   const fetchMeasurements = () => {
     setMeasurements(loadMeasurements());
@@ -136,8 +143,20 @@ const MeasurementHistory = () => {
     }
   };
 
+  const handleViewMap = (measurement: Measurement) => {
+    if (measurement.coordinates && measurement.coordinates.length > 0) {
+      setSelectedMeasurement(measurement);
+      setIsMapViewOpen(true);
+    } else {
+      toast.info("Для этого измерения нет сохраненных координат карты.");
+    }
+  };
+
+  const defaultCenter = { lat: 55.7558, lng: 37.6173 }; // Moscow coordinates
+  const currentMapType = loadSettings().mapType;
+
   return (
-    <div className="flex flex-col items-center p-4 w-full"> {/* Removed min-h-screen and bg/text colors as Layout handles it */}
+    <div className="flex flex-col items-center p-4 w-full">
       <h1 className="text-3xl font-bold mb-6 mt-12 text-center">{t('measurementHistory')}</h1>
 
       {measurements.length === 0 ? (
@@ -155,7 +174,7 @@ const MeasurementHistory = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDeleteClick(m.id)}
-                    aria-label={`Удалить измерение ${m.name}`} // Added aria-label
+                    aria-label={`Удалить измерение ${m.name}`}
                   >
                     <Trash2 className="h-5 w-5 text-red-500" />
                   </Button>
@@ -175,6 +194,11 @@ const MeasurementHistory = () => {
                   <Button variant="outline" size="sm" onClick={() => handleExportExcel(m)} aria-label={`Экспорт ${m.name} в Excel`}>
                     <FileSpreadsheet className="h-4 w-4 mr-2" /> {t('exportToExcel')}
                   </Button>
+                  {m.coordinates && m.coordinates.length > 0 && (
+                    <Button variant="outline" size="sm" onClick={() => handleViewMap(m)} aria-label={`Посмотреть карту для ${m.name}`}>
+                      <Map className="h-4 w-4 mr-2" /> Посмотреть на карте
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -201,8 +225,6 @@ const MeasurementHistory = () => {
         </div>
       )}
 
-      {/* Removed Link to home as sidebar handles navigation */}
-
       {/* AlertDialog for individual measurement deletion */}
       <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
         <AlertDialogContent>
@@ -218,7 +240,25 @@ const MeasurementHistory = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* MadeWithDyad is now in Layout, remove from here */}
+
+      {/* Map View Dialog */}
+      <Dialog open={isMapViewOpen} onOpenChange={setIsMapViewOpen}>
+        <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{selectedMeasurement?.name || 'Карта измерения'}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 w-full">
+            {selectedMeasurement && selectedMeasurement.coordinates && (
+              <MapComponent
+                markers={selectedMeasurement.coordinates}
+                center={selectedMeasurement.coordinates[0] || defaultCenter}
+                zoom={16} // Adjust zoom as needed
+                mapType={currentMapType}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
