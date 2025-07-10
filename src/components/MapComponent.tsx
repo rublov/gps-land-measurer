@@ -19,7 +19,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom, mapT
   const polygonRef = useRef<google.maps.Polygon | null>(null);
 
   useEffect(() => {
-    if (mapRef.current && !googleMap.current && window.google) {
+    if (mapRef.current && !googleMap.current && typeof window.google !== 'undefined') {
       googleMap.current = new window.google.maps.Map(mapRef.current, {
         center: center,
         zoom: zoom,

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { Trash2, FileText, FileSpreadsheet, Map } from 'lucide-react'; // Added Map icon
+import { Trash2, FileText, FileSpreadsheet, Map } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import {
@@ -26,8 +26,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"; // Import Dialog components
-import MapComponent from '@/components/MapComponent'; // Import MapComponent
+} from "@/components/ui/dialog";
+import MapComponent from '@/components/MapComponent';
 
 const MeasurementHistory = () => {
   const { t } = useTranslation();
@@ -54,7 +54,7 @@ const MeasurementHistory = () => {
   const handleConfirmDelete = () => {
     if (measurementToDelete) {
       deleteMeasurement(measurementToDelete);
-      fetchMeasurements(); // Refresh the list
+      fetchMeasurements();
       toast.success(t('deleteMeasurement') + '!');
       setMeasurementToDelete(null);
       setIsDeleteConfirmOpen(false);
@@ -63,35 +63,34 @@ const MeasurementHistory = () => {
 
   const handleClearAll = () => {
     clearAllMeasurements();
-    fetchMeasurements(); // Refresh the list
+    fetchMeasurements();
     toast.success("Все измерения удалены!");
-    setIsClearAllConfirmOpen(false); // Close dialog after action
+    setIsClearAllConfirmOpen(false);
   };
 
   const handleExportPdf = async (measurement: Measurement) => {
     toast.info(`Генерация PDF для "${measurement.name}"...`);
     try {
-      // Create a temporary div to render the content for PDF
       const content = document.createElement('div');
       content.style.padding = '20px';
       content.style.fontFamily = 'Arial, sans-serif';
       content.innerHTML = `
         <h1 style="font-size: 24px; margin-bottom: 10px;">${t('appName')} - ${t('saveMeasurement')}</h1>
         <p style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">${t('plotName')}: ${measurement.name}</p>
-        <p style="font-size: 16px; margin-bottom: 5px;">${t('area')}: ${measurement.areaSotkas.toFixed(2)} ${t('sotkas')} (${measurement.areaSqMeters.toFixed(2)} ${t('squareMeters')})</p>
+        <p style="font-size: 16px; margin-bottom: 5px;">${measurement.areaSotkas.toFixed(2)} ${t('sotkas')} (${measurement.areaSqMeters.toFixed(2)} ${t('squareMeters')})</p>
         <p style="font-size: 14px; color: #555;">${format(new Date(measurement.date), 'dd MMMM yyyy, HH:mm', { locale: ru })}</p>
         <p style="font-size: 12px; color: #888; margin-top: 20px;">Примечание: Карта не включена в PDF-экспорт.</p>
       `;
-      document.body.appendChild(content); // Temporarily add to DOM for html2canvas
+      document.body.appendChild(content);
 
       const canvas = await html2canvas(content, { scale: 2 });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 190; // A4 width - 20mm margin
+      const imgWidth = 190;
       const pageHeight = pdf.internal.pageSize.height;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
-      let position = 10; // Initial position from top
+      let position = 10;
 
       pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
@@ -104,7 +103,7 @@ const MeasurementHistory = () => {
       }
 
       pdf.save(`${measurement.name}_${format(new Date(measurement.date), 'yyyyMMdd')}.pdf`);
-      document.body.removeChild(content); // Remove temporary div
+      document.body.removeChild(content);
       toast.success(t('exportToPdf') + ' ' + t('save') + '!');
     } catch (error) {
       console.error("Error exporting PDF:", error);
@@ -125,7 +124,7 @@ const MeasurementHistory = () => {
       const csvContent = [headers.join(','), data.join(',')].join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
-      if (link.download !== undefined) { // Feature detection for download attribute
+      if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
         link.setAttribute('download', `${measurement.name}_${format(new Date(measurement.date), 'yyyyMMdd')}.csv`);
@@ -152,7 +151,7 @@ const MeasurementHistory = () => {
     }
   };
 
-  const defaultCenter = { lat: 55.7558, lng: 37.6173 }; // Moscow coordinates
+  const defaultCenter = { lat: 55.7558, lng: 37.6173 };
   const currentMapType = loadSettings().mapType;
 
   return (
@@ -225,7 +224,6 @@ const MeasurementHistory = () => {
         </div>
       )}
 
-      {/* AlertDialog for individual measurement deletion */}
       <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -241,7 +239,6 @@ const MeasurementHistory = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Map View Dialog */}
       <Dialog open={isMapViewOpen} onOpenChange={setIsMapViewOpen}>
         <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col">
           <DialogHeader>
@@ -252,7 +249,7 @@ const MeasurementHistory = () => {
               <MapComponent
                 markers={selectedMeasurement.coordinates}
                 center={selectedMeasurement.coordinates[0] || defaultCenter}
-                zoom={16} // Adjust zoom as needed
+                zoom={16}
                 mapType={currentMapType}
               />
             )}

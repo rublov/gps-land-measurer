@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
-// import { MadeWithDyad } from "@/components/made-with-dyad"; // Removed MadeWithDyad
 
 const ManualInputMode = () => {
   const { t } = useTranslation();
@@ -77,12 +76,11 @@ const ManualInputMode = () => {
     if (calculatedSqMeters > 0) {
       setIsSaveDialogOpen(true);
     } else {
-      toast.error(t('invalidInput')); // Or a more specific message like "Enter a value first"
+      toast.error(t('invalidInput'));
     }
   };
 
   const handleSaveSuccess = () => {
-    // Optionally reset state after successful save
     setSqMetersInput('');
     setHectaresInput('');
     setCalculatedSotkas(0);
@@ -90,7 +88,7 @@ const ManualInputMode = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 w-full"> {/* Removed min-h-screen and bg/text colors as Layout handles it */}
+    <div className="flex flex-col items-center justify-center p-4 w-full">
       <h1 className="text-3xl font-bold mb-6 text-center">{t('manualInputMode')}</h1>
       <div className="space-y-6 w-full max-w-sm">
         <div>
@@ -127,7 +125,6 @@ const ManualInputMode = () => {
           {t('saveMeasurement')}
         </Button>
       </div>
-      {/* Removed Link to home as sidebar handles navigation */}
 
       <SaveMeasurementDialog
         isOpen={isSaveDialogOpen}
@@ -135,7 +132,6 @@ const ManualInputMode = () => {
         areaSqMeters={calculatedSqMeters}
         areaSotkas={calculatedSotkas}
       />
-      {/* MadeWithDyad is now in Layout, remove from here */}
     </div>
   );
 };

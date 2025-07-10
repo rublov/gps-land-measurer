@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom'; // Keep Link for potential internal links if needed, but remove 'Return to Home'
+import { Link } from 'react-router-dom';
 import MapComponent from '@/components/MapComponent';
 import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
-import { loadSettings } from '@/utils/storage'; // Import loadSettings
-// import { MadeWithDyad } from "@/components/made-with-dyad"; // Removed MadeWithDyad
+import { loadSettings } from '@/utils/storage';
 
 interface LatLng {
   lat: number;
@@ -23,21 +22,20 @@ const WalkingMode = () => {
   const [calculatedAreaSqMeters, setCalculatedAreaSqMeters] = useState<number>(0);
   const [calculatedAreaSotkas, setCalculatedAreaSotkas] = useState<number>(0);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState<boolean>(false);
-  const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>(loadSettings().mapType); // Load initial map type
+  const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>(loadSettings().mapType);
 
   const watchId = useRef<number | null>(null);
-  const lastRecordedLocation = useRef<LatLng | null>(null); // Corrected initialization
+  const lastRecordedLocation = useRef<LatLng | null>(null);
 
-  const defaultCenter: LatLng = { lat: 55.7558, lng: 37.6173 }; // Moscow coordinates
+  const defaultCenter: LatLng = { lat: 55.7558, lng: 37.6173 };
 
   useEffect(() => {
-    // Listen for changes in settings (e.g., from Settings page)
     const handleStorageChange = () => {
       setMapType(loadSettings().mapType);
     };
     window.addEventListener('storage', handleStorageChange);
 
-    if (!navigator.geolocation) {
+    if (typeof navigator !== 'undefined' && !navigator.geolocation) {
       toast.error(t('gpsAccessError'));
       return;
     }
@@ -49,25 +47,21 @@ const WalkingMode = () => {
         setCurrentLocation(newLocation);
         setGpsAccuracy(accuracy);
 
-        if (accuracy > 15) { // Threshold for weak signal, adjust as needed
+        if (accuracy > 15) {
           toast.warning(t('weakGpsSignal'), { duration: 3000 });
         }
 
         if (isMeasuring) {
-          // Only add new points if the user has moved a significant distance
-          // or if it's the very first point
           if (!lastRecordedLocation.current ||
-              window.google.maps.geometry.spherical.computeDistanceBetween(
+              (typeof window.google !== 'undefined' && window.google.maps.geometry.spherical.computeDistanceBetween(
                 new window.google.maps.LatLng(lastRecordedLocation.current.lat, lastRecordedLocation.current.lng),
                 new window.google.maps.LatLng(newLocation.lat, newLocation.lng)
-              ) > 1) { // Add point if moved more than 1 meter
+              ) > 1)) {
             setTrackedPath((prev) => {
               const updatedPath = [...prev, newLocation];
               lastRecordedLocation.current = newLocation;
-              // Calculate area dynamically if enough points
               if (updatedPath.length >= 3) {
                 const currentPolygon = [...updatedPath];
-                // For live calculation, close the polygon with the current location
                 if (currentLocation) {
                   currentPolygon.push(currentLocation);
                 }
@@ -83,7 +77,7 @@ const WalkingMode = () => {
       (error) => {
         console.error("Geolocation error:", error);
         toast.error(t('gpsAccessError'));
-        setIsMeasuring(false); // Stop measurement on error
+        setIsMeasuring(false);
       },
       {
         enableHighAccuracy: true,
@@ -98,7 +92,7 @@ const WalkingMode = () => {
       }
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [isMeasuring, t, currentLocation]); // Added currentLocation to dependency array for live polygon update
+  }, [isMeasuring, t, currentLocation]);
 
   const handleStartMeasurement = () => {
     setIsMeasuring(true);
@@ -115,10 +109,9 @@ const WalkingMode = () => {
       toast.error(t('insufficientData'));
       setCalculatedAreaSqMeters(0);
       setCalculatedAreaSotkas(0);
-      setTrackedPath([]); // Clear path if not enough data
+      setTrackedPath([]);
       return;
     }
-    // Final calculation with the closed polygon
     const areaSqM = calculateArea(trackedPath);
     setCalculatedAreaSqMeters(areaSqM);
     setCalculatedAreaSotkas(convertSqMetersToSotkas(areaSqM));
@@ -138,22 +131,20 @@ const WalkingMode = () => {
     if (calculatedAreaSqMeters > 0) {
       setIsSaveDialogOpen(true);
     } else {
-      toast.error(t('insufficientData')); // Or a more specific message like "End measurement first"
+      toast.error(t('insufficientData'));
     }
   };
 
   const handleSaveSuccess = () => {
-    // Optionally reset state after successful save
     setTrackedPath([]);
     setCalculatedAreaSqMeters(0);
     setCalculatedAreaSotkas(0);
   };
 
-  // Determine markers for MapComponent: tracked path + current location if measuring
   const mapMarkers = isMeasuring && currentLocation ? [...trackedPath, currentLocation] : trackedPath;
 
   return (
-    <div className="flex flex-col items-center p-4 w-full"> {/* Removed min-h-screen and bg/text colors as Layout handles it */}
+    <div className="flex flex-col items-center p-4 w-full">
       <h1 className="text-3xl font-bold mb-4 text-center">{t('walkingMode')}</h1>
       <p className="text-lg mb-4 text-center">
         {t('gpsAccuracy')}: {gpsAccuracy !== null ? `${gpsAccuracy.toFixed(1)} м` : '...'}
@@ -164,7 +155,7 @@ const WalkingMode = () => {
           markers={mapMarkers}
           center={currentLocation || defaultCenter}
           zoom={currentLocation ? 18 : 10}
-          mapType={mapType} // Pass mapType prop
+          mapType={mapType}
         />
       </div>
 
@@ -196,7 +187,6 @@ const WalkingMode = () => {
           {t('saveMeasurement')}
         </Button>
       </div>
-      {/* Removed Link to home as sidebar handles navigation */}
 
       <SaveMeasurementDialog
         isOpen={isSaveDialogOpen}
@@ -206,7 +196,6 @@ const WalkingMode = () => {
         coordinates={trackedPath}
         onSaveSuccess={handleSaveSuccess}
       />
-      {/* MadeWithDyad is now in Layout, remove from here */}
     </div>
   );
 };

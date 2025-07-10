@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom'; // Corrected import statement
+import { Link } from 'react-router-dom';
 import MapComponent from '@/components/MapComponent';
 import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
-import { loadSettings } from '@/utils/storage'; // Import loadSettings
-// import { MadeWithDyad } from "@/components/made-with-dyad"; // Removed MadeWithDyad
+import { loadSettings } from '@/utils/storage';
 
 interface LatLng {
   lat: number;
@@ -22,18 +21,17 @@ const GpsMarkerMode = () => {
   const [calculatedAreaSqMeters, setCalculatedAreaSqMeters] = useState<number>(0);
   const [calculatedAreaSotkas, setCalculatedAreaSotkas] = useState<number>(0);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState<boolean>(false);
-  const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>(loadSettings().mapType); // Load initial map type
+  const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>(loadSettings().mapType);
 
   const watchId = useRef<number | null>(null);
 
   useEffect(() => {
-    // Listen for changes in settings (e.g., from Settings page)
     const handleStorageChange = () => {
       setMapType(loadSettings().mapType);
     };
     window.addEventListener('storage', handleStorageChange);
 
-    if (!navigator.geolocation) {
+    if (typeof navigator !== 'undefined' && !navigator.geolocation) {
       toast.error(t('gpsAccessError'));
       return;
     }
@@ -44,7 +42,7 @@ const GpsMarkerMode = () => {
         setCurrentLocation({ lat: latitude, lng: longitude });
         setGpsAccuracy(accuracy);
 
-        if (accuracy > 15) { // Threshold for weak signal, adjust as needed
+        if (accuracy > 15) {
           toast.warning(t('weakGpsSignal'), { duration: 3000 });
         }
       },
@@ -101,21 +99,20 @@ const GpsMarkerMode = () => {
     if (calculatedAreaSqMeters > 0) {
       setIsSaveDialogOpen(true);
     } else {
-      toast.error(t('insufficientData')); // Or a more specific message like "Calculate area first"
+      toast.error(t('insufficientData'));
     }
   };
 
   const handleSaveSuccess = () => {
-    // Optionally reset state after successful save
     setMarkers([]);
     setCalculatedAreaSqMeters(0);
     setCalculatedAreaSotkas(0);
   };
 
-  const defaultCenter: LatLng = { lat: 55.7558, lng: 37.6173 }; // Moscow coordinates
+  const defaultCenter: LatLng = { lat: 55.7558, lng: 37.6173 };
 
   return (
-    <div className="flex flex-col items-center p-4 w-full"> {/* Removed min-h-screen and bg/text colors as Layout handles it */}
+    <div className="flex flex-col items-center p-4 w-full">
       <h1 className="text-3xl font-bold mb-4 text-center">{t('gpsMarkerMode')}</h1>
       <p className="text-lg mb-4 text-center">
         {t('gpsAccuracy')}: {gpsAccuracy !== null ? `${gpsAccuracy.toFixed(1)} м` : '...'}
@@ -126,7 +123,7 @@ const GpsMarkerMode = () => {
           markers={markers}
           center={currentLocation || defaultCenter}
           zoom={currentLocation ? 18 : 10}
-          mapType={mapType} // Pass mapType prop
+          mapType={mapType}
         />
       </div>
 
@@ -156,7 +153,6 @@ const GpsMarkerMode = () => {
           {t('saveMeasurement')}
         </Button>
       </div>
-      {/* Removed Link to home as sidebar handles navigation */}
 
       <SaveMeasurementDialog
         isOpen={isSaveDialogOpen}
@@ -166,7 +162,6 @@ const GpsMarkerMode = () => {
         coordinates={markers}
         onSaveSuccess={handleSaveSuccess}
       />
-      {/* MadeWithDyad is now in Layout, remove from here */}
     </div>
   );
 };
