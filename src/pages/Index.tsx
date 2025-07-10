@@ -2,12 +2,15 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ThemeToggle from "@/components/ThemeToggle"; // Import ThemeToggle
 
 const Index = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative"> {/* Added relative for positioning */}
+      <ThemeToggle /> {/* Add ThemeToggle here */}
+
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">{t('welcomeTitle')}</h1>
         <p className="text-xl text-gray-600 dark:text-gray-400">{t('welcomeMessage')}</p>
