@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Keep Link for potential internal links if needed, but remove 'Return to Home'
 import { loadMeasurements, deleteMeasurement, clearAllMeasurements, Measurement, loadSettings } from '@/utils/storage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';

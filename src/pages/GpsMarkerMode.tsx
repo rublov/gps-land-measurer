@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom'; // Keep Link for potential internal links if needed, but remove 'Return to Home'
+import { Link } from 'react-router-dom'; // Corrected import statement
 import MapComponent from '@/components/MapComponent';
 import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
