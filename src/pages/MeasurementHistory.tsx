@@ -10,10 +10,22 @@ import { toast } from 'sonner';
 import { Trash2, FileText, FileSpreadsheet } from 'lucide-react'; // Icons for delete and export
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const MeasurementHistory = () => {
   const { t } = useTranslation();
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  const [isClearAllConfirmOpen, setIsClearAllConfirmOpen] = useState<boolean>(false);
 
   const fetchMeasurements = () => {
     setMeasurements(loadMeasurements());
@@ -30,11 +42,10 @@ const MeasurementHistory = () => {
   };
 
   const handleClearAll = () => {
-    if (window.confirm("Вы уверены, что хотите удалить все измерения?")) {
-      clearAllMeasurements();
-      fetchMeasurements(); // Refresh the list
-      toast.success("Все измерения удалены!");
-    }
+    clearAllMeasurements();
+    fetchMeasurements(); // Refresh the list
+    toast.success("Все измерения удалены!");
+    setIsClearAllConfirmOpen(false); // Close dialog after action
   };
 
   const handleExportPdf = async (measurement: Measurement) => {
@@ -150,9 +161,25 @@ const MeasurementHistory = () => {
               </CardContent>
             </Card>
           ))}
-          <Button variant="destructive" className="w-full mt-4" onClick={handleClearAll}>
-            {t('clearAll')}
-          </Button>
+          <AlertDialog open={isClearAllConfirmOpen} onOpenChange={setIsClearAllConfirmOpen}>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="w-full mt-4">
+                {t('clearAll')}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Это действие безвозвратно удалит все сохраненные измерения.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearAll}>Удалить все</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
 
