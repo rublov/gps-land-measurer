@@ -6,18 +6,24 @@ import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
 import { convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
+import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
 
 const ManualInputMode = () => {
   const { t } = useTranslation();
   const [sqMetersInput, setSqMetersInput] = useState<string>('');
   const [hectaresInput, setHectaresInput] = useState<string>('');
   const [calculatedSotkas, setCalculatedSotkas] = useState<number>(0);
+  const [calculatedSqMeters, setCalculatedSqMeters] = useState<number>(0);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState<boolean>(false);
+
 
   const convertAndSetSotkas = (sqM: number) => {
     if (isNaN(sqM) || sqM < 0) {
       setCalculatedSotkas(0);
+      setCalculatedSqMeters(0);
       return;
     }
+    setCalculatedSqMeters(sqM);
     setCalculatedSotkas(convertSqMetersToSotkas(sqM));
   };
 
@@ -66,14 +72,20 @@ const ManualInputMode = () => {
     convertAndSetSotkas(sqM);
   };
 
-  // No explicit "Calculate" button needed as conversions happen in real-time
-  // The button can remain for consistency or be removed if not needed for other actions.
-  const handleCalculate = () => {
-    // This function can be used for future "Save" functionality or other actions
-    // For now, conversions are real-time.
-    if (sqMetersInput === '' && hectaresInput === '') {
-      toast.warning(t('invalidInput'));
+  const handleOpenSaveDialog = () => {
+    if (calculatedSqMeters > 0) {
+      setIsSaveDialogOpen(true);
+    } else {
+      toast.error(t('invalidInput')); // Or a more specific message like "Enter a value first"
     }
+  };
+
+  const handleSaveSuccess = () => {
+    // Optionally reset state after successful save
+    setSqMetersInput('');
+    setHectaresInput('');
+    setCalculatedSotkas(0);
+    setCalculatedSqMeters(0);
   };
 
   return (
@@ -110,13 +122,20 @@ const ManualInputMode = () => {
             {calculatedSotkas.toFixed(2)} {t('sotkas')}
           </span>
         </div>
-        <Button className="w-full" onClick={handleCalculate}>
-          {t('calculate')}
+        <Button className="w-full" onClick={handleOpenSaveDialog} disabled={calculatedSqMeters === 0}>
+          {t('saveMeasurement')}
         </Button>
       </div>
       <Link to="/" className="mt-8">
         <Button variant="outline">{t('returnToHome')}</Button>
       </Link>
+
+      <SaveMeasurementDialog
+        isOpen={isSaveDialogOpen}
+        onClose={() => setIsSaveDialogOpen(false)}
+        areaSqMeters={calculatedSqMeters}
+        areaSotkas={calculatedSotkas}
+      />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import MapComponent from '@/components/MapComponent';
 import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
+import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
 
 interface LatLng {
   lat: number;
@@ -18,6 +19,7 @@ const GpsMarkerMode = () => {
   const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null);
   const [calculatedAreaSqMeters, setCalculatedAreaSqMeters] = useState<number>(0);
   const [calculatedAreaSotkas, setCalculatedAreaSotkas] = useState<number>(0);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState<boolean>(false);
 
   const watchId = useRef<number | null>(null);
 
@@ -85,6 +87,21 @@ const GpsMarkerMode = () => {
     setCalculatedAreaSotkas(convertSqMetersToSotkas(areaSqM));
   };
 
+  const handleOpenSaveDialog = () => {
+    if (calculatedAreaSqMeters > 0) {
+      setIsSaveDialogOpen(true);
+    } else {
+      toast.error(t('insufficientData')); // Or a more specific message like "Calculate area first"
+    }
+  };
+
+  const handleSaveSuccess = () => {
+    // Optionally reset state after successful save
+    setMarkers([]);
+    setCalculatedAreaSqMeters(0);
+    setCalculatedAreaSotkas(0);
+  };
+
   const defaultCenter: LatLng = { lat: 55.7558, lng: 37.6173 }; // Moscow coordinates
 
   return (
@@ -124,10 +141,22 @@ const GpsMarkerMode = () => {
         <Button className="w-full" onClick={handleCalculateArea} disabled={markers.length < 3}>
           {t('calculateArea')}
         </Button>
+        <Button className="w-full" onClick={handleOpenSaveDialog} disabled={calculatedAreaSqMeters === 0}>
+          {t('saveMeasurement')}
+        </Button>
       </div>
       <Link to="/" className="mt-8">
         <Button variant="outline">{t('returnToHome')}</Button>
       </Link>
+
+      <SaveMeasurementDialog
+        isOpen={isSaveDialogOpen}
+        onClose={() => setIsSaveDialogOpen(false)}
+        areaSqMeters={calculatedAreaSqMeters}
+        areaSotkas={calculatedAreaSotkas}
+        coordinates={markers}
+        onSaveSuccess={handleSaveSuccess}
+      />
     </div>
   );
 };
