@@ -6,6 +6,7 @@ import MapComponent from '@/components/MapComponent';
 import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
+import { loadSettings } from '@/utils/storage'; // Import loadSettings
 
 interface LatLng {
   lat: number;
@@ -21,6 +22,7 @@ const WalkingMode = () => {
   const [calculatedAreaSqMeters, setCalculatedAreaSqMeters] = useState<number>(0);
   const [calculatedAreaSotkas, setCalculatedAreaSotkas] = useState<number>(0);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState<boolean>(false);
+  const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>(loadSettings().mapType); // Load initial map type
 
   const watchId = useRef<number | null>(null);
   const lastRecordedLocation = useRef<LatLng | null>(null);
@@ -28,6 +30,12 @@ const WalkingMode = () => {
   const defaultCenter: LatLng = { lat: 55.7558, lng: 37.6173 }; // Moscow coordinates
 
   useEffect(() => {
+    // Listen for changes in settings (e.g., from Settings page)
+    const handleStorageChange = () => {
+      setMapType(loadSettings().mapType);
+    };
+    window.addEventListener('storage', handleStorageChange);
+
     if (!navigator.geolocation) {
       toast.error(t('gpsAccessError'));
       return;
@@ -87,6 +95,7 @@ const WalkingMode = () => {
       if (watchId.current !== null) {
         navigator.geolocation.clearWatch(watchId.current);
       }
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [isMeasuring, t, currentLocation]); // Added currentLocation to dependency array for live polygon update
 
@@ -154,6 +163,7 @@ const WalkingMode = () => {
           markers={mapMarkers}
           center={currentLocation || defaultCenter}
           zoom={currentLocation ? 18 : 10}
+          mapType={mapType} // Pass mapType prop
         />
       </div>
 

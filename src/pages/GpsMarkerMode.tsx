@@ -6,6 +6,7 @@ import MapComponent from '@/components/MapComponent';
 import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
+import { loadSettings } from '@/utils/storage'; // Import loadSettings
 
 interface LatLng {
   lat: number;
@@ -20,10 +21,17 @@ const GpsMarkerMode = () => {
   const [calculatedAreaSqMeters, setCalculatedAreaSqMeters] = useState<number>(0);
   const [calculatedAreaSotkas, setCalculatedAreaSotkas] = useState<number>(0);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState<boolean>(false);
+  const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>(loadSettings().mapType); // Load initial map type
 
   const watchId = useRef<number | null>(null);
 
   useEffect(() => {
+    // Listen for changes in settings (e.g., from Settings page)
+    const handleStorageChange = () => {
+      setMapType(loadSettings().mapType);
+    };
+    window.addEventListener('storage', handleStorageChange);
+
     if (!navigator.geolocation) {
       toast.error(t('gpsAccessError'));
       return;
@@ -54,6 +62,7 @@ const GpsMarkerMode = () => {
       if (watchId.current !== null) {
         navigator.geolocation.clearWatch(watchId.current);
       }
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [t]);
 
@@ -116,6 +125,7 @@ const GpsMarkerMode = () => {
           markers={markers}
           center={currentLocation || defaultCenter}
           zoom={currentLocation ? 18 : 10}
+          mapType={mapType} // Pass mapType prop
         />
       </div>
 

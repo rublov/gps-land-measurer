@@ -9,9 +9,10 @@ interface MapComponentProps {
   markers: LatLng[];
   center: LatLng;
   zoom: number;
+  mapType?: 'roadmap' | 'satellite' | 'hybrid' | 'terrain'; // Added mapType prop
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom, mapType = 'hybrid' }) => { // Default to hybrid
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMap = useRef<google.maps.Map | null>(null);
   const googleMarkers = useRef<google.maps.Marker[]>([]);
@@ -22,7 +23,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom }) =>
       googleMap.current = new window.google.maps.Map(mapRef.current, {
         center: center,
         zoom: zoom,
-        mapTypeId: window.google.maps.MapTypeId.HYBRID, // Use hybrid for satellite view
+        mapTypeId: window.google.maps.MapTypeId[mapType.toUpperCase() as keyof typeof window.google.maps.MapTypeId], // Use mapType prop
         disableDefaultUI: true, // Disable default UI for a cleaner look
         zoomControl: true,
         streetViewControl: false,
@@ -30,7 +31,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers, center, zoom }) =>
         fullscreenControl: false,
       });
     }
-  }, [center, zoom]);
+  }, [center, zoom, mapType]); // Added mapType to dependencies
 
   useEffect(() => {
     if (!googleMap.current) return;
