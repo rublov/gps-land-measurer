@@ -1,4 +1,4 @@
-import React, { useState } => 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -12,14 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from 'sonner';
-import { saveMeasurement, Measurement } from '@/utils/storage';
+import { saveMeasurement } from '@/utils/storage';
+import { LatLng, Measurement } from '@/types';
 
 interface SaveMeasurementDialogProps {
   isOpen: boolean;
   onClose: () => void;
   areaSqMeters: number;
   areaSotkas: number;
-  coordinates?: { lat: number; lng: number }[];
+  coordinates?: LatLng[];
   onSaveSuccess?: () => void;
 }
 

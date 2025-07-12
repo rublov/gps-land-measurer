@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 Онлайн-сборка APK</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .service-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .step {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #007acc;
+            border-radius: 4px;
+        }
+        .command-box {
+            background: #2d2d2d;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #00b894;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌐 Онлайн-сервисы для создания APK</h1>
+    
+    <div class="warning">
+        <strong>⚠️ Статус:</strong> Локальная сборка APK требует Android Studio. Используем онлайн-сервисы.
+    </div>
+
+    <div class="service-card">
+        <h2>🚀 Метод 1: GitHub Actions (Автоматическая сборка)</h2>
+        <p><strong>Файл создан:</strong> .github/workflows/build-apk.yml</p>
+        
+        <div class="step">
+            <h3>Шаг 1: Загрузите проект на GitHub</h3>
+            <div class="command-box">
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/land-measurer.git
+git push -u origin main
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Шаг 2: GitHub Actions автоматически соберет APK</h3>
+            <p>Перейдите в раздел "Actions" на GitHub и скачайте готовый APK</p>
+        </div>
+    </div>
+
+    <div class="service-card">
+        <h2>📱 Метод 2: Capacitor Cloud</h2>
+        
+        <div class="step">
+            <h3>Регистрация</h3>
+            <p>Зарегистрируйтесь на <a href="https://capacitorjs.com/cloud" style="color: #ffd700;">capacitorjs.com/cloud</a></p>
+        </div>
+
+        <div class="step">
+            <h3>Команды</h3>
+            <div class="command-box">
+npx @capacitor/cloud login
+npx @capacitor/cloud build android
+            </div>
+        </div>
+    </div>
+
+    <div class="service-card">
+        <h2>🔨 Метод 3: Ionic Appflow</h2>
+        
+        <div class="step">
+            <h3>Установка</h3>
+            <div class="command-box">
+npm install -g @ionic/cli
+ionic signup
+ionic link
+ionic capacitor build android --prod
+            </div>
+        </div>
+    </div>
+
+    <div class="service-card">
+        <h2>⚡ Метод 4: Cordova Build Online</h2>
+        
+        <div class="step">
+            <h3>Подготовка</h3>
+            <p><strong>Файл создан:</strong> config.xml (конфигурация Cordova)</p>
+            
+            <div class="command-box">
+# Использовать онлайн-сервисы типа:
+# - build.phonegap.com (если доступен)
+# - Intel XDK (если доступен)
+# - Monaca (monaca.io)
+            </div>
+        </div>
+    </div>
+
+    <div class="success">
+        <h3>✅ Рекомендация: GitHub Actions</h3>
+        <p>Самый надежный способ - загрузить проект на GitHub. Actions автоматически соберет APK с правильным Android SDK.</p>
+        
+        <ol>
+            <li>Создайте репозиторий на GitHub</li>
+            <li>Загрузите проект</li>
+            <li>GitHub Actions запустится автоматически</li>
+            <li>Скачайте готовый APK из раздела Artifacts</li>
+        </ol>
+    </div>
+
+    <div class="warning">
+        <h3>💡 Альтернатива</h3>
+        <p>Если онлайн-сервисы не работают, единственный надежный способ - установить Android Studio локально:</p>
+        <div class="command-box">
+# Скачать Android Studio
+# https://developer.android.com/studio
+
+# Открыть проект
+npx cap open android
+
+# Собрать APK в Android Studio
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.1); border-radius: 8px;">
+        <h3>🎯 Выберите удобный метод</h3>
+        <p>GitHub Actions - самый простой и надежный способ получить APK</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест кнопки GPS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            background: #2563eb;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background: #1d4ed8;
+        }
+        .button:active {
+            transform: scale(0.98);
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 6px;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Тест GPS функции</h1>
+        
+        <div class="status">
+            <strong>Статус:</strong> <span id="status">Готов к тестированию</span>
+        </div>
+        
+        <button class="button" onclick="testSimpleGPS()">
+            📍 Простой GPS тест
+        </button>
+        
+        <button class="button" onclick="testAdvancedGPS()">
+            🎯 Продвинутый GPS тест (3 запроса)
+        </button>
+        
+        <button class="button" onclick="testReactApp()">
+            🔗 Перейти к React приложению
+        </button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        function addResult(message) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'result';
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            results.appendChild(div);
+        }
+        
+        function testSimpleGPS() {
+            updateStatus('Тестирую простой GPS...');
+            
+            if (!navigator.geolocation) {
+                addResult('❌ GPS не поддерживается браузером');
+                updateStatus('GPS не поддерживается');
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude, accuracy } = position.coords;
+                    addResult(`✅ GPS получен: ${latitude.toFixed(6)}, ${longitude.toFixed(6)} (±${accuracy.toFixed(0)}м)`);
+                    updateStatus('GPS получен успешно');
+                },
+                (error) => {
+                    addResult(`❌ Ошибка GPS: ${error.message}`);
+                    updateStatus('Ошибка GPS');
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+        
+        function testAdvancedGPS() {
+            updateStatus('Тестирую продвинутый GPS (3 запроса)...');
+            
+            if (!navigator.geolocation) {
+                addResult('❌ GPS не поддерживается браузером');
+                updateStatus('GPS не поддерживается');
+                return;
+            }
+            
+            const positions = [];
+            let requestsCompleted = 0;
+            const totalRequests = 3;
+            
+            for (let i = 0; i < totalRequests; i++) {
+                setTimeout(() => {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            positions.push(position);
+                            requestsCompleted++;
+                            
+                            addResult(`📍 GPS запрос ${requestsCompleted}/${totalRequests} - точность: ±${position.coords.accuracy.toFixed(0)}м`);
+                            
+                            if (requestsCompleted === totalRequests) {
+                                const bestPosition = positions.reduce((best, current) => 
+                                    current.coords.accuracy < best.coords.accuracy ? current : best
+                                );
+                                
+                                const { latitude, longitude, accuracy } = bestPosition.coords;
+                                addResult(`🎯 Лучший результат: ${latitude.toFixed(6)}, ${longitude.toFixed(6)} (±${accuracy.toFixed(0)}м)`);
+                                updateStatus('Продвинутый GPS завершен');
+                            }
+                        },
+                        (error) => {
+                            requestsCompleted++;
+                            addResult(`❌ Ошибка GPS запроса ${requestsCompleted}: ${error.message}`);
+                            
+                            if (requestsCompleted === totalRequests && positions.length === 0) {
+                                updateStatus('Все GPS запросы провалились');
+                            }
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 30000,
+                            maximumAge: 0
+                        }
+                    );
+                }, i * 2000);
+            }
+        }
+        
+        function testReactApp() {
+            updateStatus('Переходим к React приложению...');
+            window.location.href = 'http://localhost:8080/';
+        }
+        
+        // Автоматическая проверка при загрузке
+        window.onload = function() {
+            if (navigator.geolocation) {
+                addResult('✅ Браузер поддерживает геолокацию');
+            } else {
+                addResult('❌ Браузер НЕ поддерживает геолокацию');
+            }
+            
+            // Проверка разрешений
+            if (navigator.permissions) {
+                navigator.permissions.query({name: 'geolocation'}).then(function(result) {
+                    addResult(`🔒 Разрешение геолокации: ${result.state}`);
+                });
+            }
+        };
+    </script>
+</body>
+</html>

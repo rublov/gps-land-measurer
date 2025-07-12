@@ -1,0 +1,12 @@
+{
+  "name": "gps-https-server",
+  "version": "1.0.0",
+  "description": "HTTPS server for GPS testing",
+  "main": "https-server.js",
+  "scripts": {
+    "start": "node https-server.js",
+    "https": "node https-server.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

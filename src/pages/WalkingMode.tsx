@@ -7,11 +7,7 @@ import { calculateArea, convertSqMetersToSotkas } from '@/utils/geometry';
 import { toast } from 'sonner';
 import SaveMeasurementDialog from '@/components/SaveMeasurementDialog';
 import { loadSettings } from '@/utils/storage';
-
-interface LatLng {
-  lat: number;
-  lng: number;
-}
+import { LatLng } from '@/types';
 
 const WalkingMode = () => {
   const { t } = useTranslation();

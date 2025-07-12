@@ -1,7 +1,4 @@
-interface LatLng {
-  lat: number;
-  lng: number;
-}
+import { LatLng } from '@/types';
 
 /**
  * Calculates the area of a polygon given its vertices using the Shoelace formula.
@@ -41,4 +38,42 @@ export const calculateArea = (coordinates: LatLng[]): number => {
  */
 export const convertSqMetersToSotkas = (sqMeters: number): number => {
   return sqMeters / 100;
+};
+
+/**
+ * Calculates the distance between two points using the Haversine formula.
+ * @param point1 First point
+ * @param point2 Second point
+ * @returns Distance in meters
+ */
+export const calculateDistance = (point1: LatLng, point2: LatLng): number => {
+  const R = 6378137; // Earth's radius in meters
+  const dLat = (point2.lat - point1.lat) * Math.PI / 180;
+  const dLng = (point2.lng - point1.lng) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+};
+
+/**
+ * Calculates the perimeter of a polygon.
+ * @param coordinates Array of points
+ * @returns Perimeter in meters
+ */
+export const calculatePerimeter = (coordinates: LatLng[]): number => {
+  if (coordinates.length < 2) {
+    return 0;
+  }
+
+  let perimeter = 0;
+  for (let i = 0; i < coordinates.length; i++) {
+    const current = coordinates[i];
+    const next = coordinates[(i + 1) % coordinates.length];
+    perimeter += calculateDistance(current, next);
+  }
+
+  return perimeter;
 };

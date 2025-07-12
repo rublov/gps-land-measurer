@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "analyze": "pnpm run build && npx vite-bundle-analyzer dist"
+  }
+}

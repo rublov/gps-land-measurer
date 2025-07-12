@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Землемер - Мобильная версия</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .gps-status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .gps-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .coordinates {
+            background: rgba(40, 167, 69, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .accuracy {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+        
+        .accuracy.good { background: #28a745; }
+        .accuracy.ok { background: #ffc107; color: #000; }
+        .accuracy.bad { background: #dc3545; }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .control-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .add-marker {
+            background: #007bff;
+            color: white;
+            grid-column: 1 / -1;
+        }
+        
+        .calculate {
+            background: #28a745;
+            color: white;
+        }
+        
+        .clear {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .results {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+        
+        .markers-list {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .marker-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+            margin: 5px 0;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📍 Землемер GPS</h1>
+            <p>Мобильная версия для измерения земельных участков</p>
+        </div>
+        
+        <div class="gps-status">
+            <div class="status">
+                <strong>GPS Статус:</strong> <span id="gpsStatus">Готов к работе</span>
+            </div>
+            
+            <div class="gps-buttons">
+                <button class="btn btn-primary" onclick="getAccurateGPS()">
+                    🎯 Точный GPS
+                </button>
+                <button class="btn btn-secondary" onclick="getBasicGPS()">
+                    📡 Базовый GPS
+                </button>
+            </div>
+            
+            <div id="coordinates" class="coordinates hidden">
+                📍 Координаты: <span id="coordsText">не получены</span>
+                <span id="accuracy" class="accuracy"></span>
+            </div>
+            
+            <div id="warning" class="warning hidden">
+                ⚠️ Точность GPS очень низкая. Для лучших результатов:
+                <br>• Выйдите на улицу или подойдите к окну
+                <br>• Убедитесь, что GPS включен на устройстве
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn add-marker" onclick="addMarker()" id="addBtn" disabled>
+                📍 Добавить точку
+            </button>
+            <button class="control-btn calculate" onclick="calculateArea()" id="calcBtn" disabled>
+                📐 Рассчитать
+            </button>
+            <button class="control-btn clear" onclick="clearMarkers()" id="clearBtn" disabled>
+                🧹 Очистить
+            </button>
+        </div>
+        
+        <div id="results" class="results">
+            <h3>📊 Результаты:</h3>
+            <div id="areaResults"></div>
+        </div>
+        
+        <div id="markersList" class="markers-list hidden">
+            <h3>📍 Точки (<span id="markerCount">0</span>):</h3>
+            <div id="markersContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentLocation = null;
+        let markers = [];
+        let gpsAccuracy = null;
+        
+        function updateStatus(message) {
+            document.getElementById('gpsStatus').textContent = message;
+        }
+        
+        function updateCoordinates(lat, lng, accuracy) {
+            currentLocation = { lat, lng };
+            gpsAccuracy = accuracy;
+            
+            document.getElementById('coordsText').textContent = 
+                `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            
+            const accuracyEl = document.getElementById('accuracy');
+            accuracyEl.textContent = `±${accuracy.toFixed(0)}м`;
+            
+            if (accuracy <= 10) {
+                accuracyEl.className = 'accuracy good';
+            } else if (accuracy <= 100) {
+                accuracyEl.className = 'accuracy ok';
+            } else {
+                accuracyEl.className = 'accuracy bad';
+            }
+            
+            document.getElementById('coordinates').classList.remove('hidden');
+            document.getElementById('addBtn').disabled = false;
+            
+            // Показать предупреждение при плохой точности
+            if (accuracy > 1000) {
+                document.getElementById('warning').classList.remove('hidden');
+            } else {
+                document.getElementById('warning').classList.add('hidden');
+            }
+        }
+        
+        function getAccurateGPS() {
+            if (!navigator.geolocation) {
+                updateStatus('GPS не поддерживается');
+                return;
+            }
+            
+            updateStatus('Поиск точного GPS...');
+            
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 60000,
+                maximumAge: 0
+            };
+            
+            let attempts = 0;
+            const maxAttempts = 5;
+            let bestAccuracy = Infinity;
+            
+            function tryGPS() {
+                attempts++;
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude, accuracy } = position.coords;
+                        
+                        if (accuracy < bestAccuracy) {
+                            bestAccuracy = accuracy;
+                            updateCoordinates(latitude, longitude, accuracy);
+                        }
+                        
+                        if (accuracy <= 10 || attempts >= maxAttempts) {
+                            updateStatus('GPS получен');
+                            return;
+                        }
+                        
+                        updateStatus(`Улучшаем точность... (${attempts}/${maxAttempts})`);
+                        setTimeout(tryGPS, 2000);
+                    },
+                    (error) => {
+                        console.error('GPS Error:', error);
+                        updateStatus('Ошибка GPS');
+                        
+                        if (attempts < maxAttempts) {
+                            setTimeout(tryGPS, 2000);
+                        }
+                    },
+                    options
+                );
+            }
+            
+            tryGPS();
+        }
+        
+        function getBasicGPS() {
+            if (!navigator.geolocation) {
+                updateStatus('GPS не поддерживается');
+                return;
+            }
+            
+            updateStatus('Получение базового GPS...');
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude, accuracy } = position.coords;
+                    updateCoordinates(latitude, longitude, accuracy);
+                    updateStatus('GPS получен');
+                },
+                (error) => {
+                    console.error('GPS Error:', error);
+                    updateStatus('Ошибка GPS');
+                },
+                {
+                    enableHighAccuracy: false,
+                    timeout: 30000,
+                    maximumAge: 300000
+                }
+            );
+        }
+        
+        function addMarker() {
+            if (!currentLocation) {
+                alert('Сначала получите GPS координаты');
+                return;
+            }
+            
+            markers.push({
+                lat: currentLocation.lat,
+                lng: currentLocation.lng,
+                accuracy: gpsAccuracy
+            });
+            
+            updateMarkersList();
+            updateButtons();
+            
+            // Вибрация на мобильных устройствах
+            if (navigator.vibrate) {
+                navigator.vibrate(100);
+            }
+        }
+        
+        function updateMarkersList() {
+            const count = markers.length;
+            document.getElementById('markerCount').textContent = count;
+            
+            if (count > 0) {
+                document.getElementById('markersList').classList.remove('hidden');
+                
+                const container = document.getElementById('markersContainer');
+                container.innerHTML = '';
+                
+                markers.forEach((marker, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'marker-item';
+                    div.innerHTML = `
+                        Точка ${index + 1}: ${marker.lat.toFixed(6)}, ${marker.lng.toFixed(6)}
+                        <br>Точность: ±${marker.accuracy.toFixed(0)}м
+                    `;
+                    container.appendChild(div);
+                });
+            } else {
+                document.getElementById('markersList').classList.add('hidden');
+            }
+        }
+        
+        function updateButtons() {
+            document.getElementById('calcBtn').disabled = markers.length < 3;
+            document.getElementById('clearBtn').disabled = markers.length === 0;
+        }
+        
+        function clearMarkers() {
+            markers = [];
+            updateMarkersList();
+            updateButtons();
+            document.getElementById('results').style.display = 'none';
+        }
+        
+        function calculateArea() {
+            if (markers.length < 3) {
+                alert('Нужно минимум 3 точки для расчета площади');
+                return;
+            }
+            
+            // Простая формула для расчета площади многоугольника
+            let area = 0;
+            const points = markers.map(m => [m.lat, m.lng]);
+            
+            for (let i = 0; i < points.length; i++) {
+                const j = (i + 1) % points.length;
+                area += points[i][0] * points[j][1];
+                area -= points[j][0] * points[i][1];
+            }
+            
+            area = Math.abs(area) / 2;
+            
+            // Конвертируем в квадратные метры (приблизительно)
+            const areaSqMeters = area * 111139 * 111139;
+            const areaSotkas = areaSqMeters / 100;
+            
+            document.getElementById('areaResults').innerHTML = `
+                <div><strong>Площадь:</strong> ${areaSqMeters.toFixed(1)} м²</div>
+                <div><strong>В сотках:</strong> ${areaSotkas.toFixed(2)} соток</div>
+                <div><strong>Точек:</strong> ${markers.length}</div>
+            `;
+            
+            document.getElementById('results').style.display = 'block';
+            
+            // Вибрация при расчете
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+        }
+        
+        // Автоматическая проверка GPS при загрузке
+        window.addEventListener('load', () => {
+            if (navigator.geolocation) {
+                updateStatus('GPS поддерживается. Нажмите кнопку для получения координат.');
+            } else {
+                updateStatus('GPS не поддерживается этим браузером');
+            }
+        });
+    </script>
+</body>
+</html>

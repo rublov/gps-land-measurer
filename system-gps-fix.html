@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Системная диагностика GPS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 15px; background: #f0f0f0; }
+        .container { max-width: 400px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 15px; }
+        .card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .btn { width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .status { padding: 8px; margin: 8px 0; border-radius: 4px; font-size: 12px; }
+        .status-success { background: #d1fae5; color: #065f46; }
+        .status-error { background: #fee2e2; color: #991b1b; }
+        .status-warning { background: #fef3c7; color: #92400e; }
+        .step { margin: 8px 0; padding: 12px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #3b82f6; }
+        .step-title { font-weight: bold; color: #1f2937; margin-bottom: 6px; }
+        .step-desc { font-size: 12px; color: #6b7280; line-height: 1.4; }
+        .coords { font-family: monospace; font-size: 11px; background: #f3f4f6; padding: 8px; border-radius: 4px; }
+        .critical { background: #fef2f2; border: 2px solid #ef4444; padding: 15px; border-radius: 8px; color: #991b1b; }
+        .success { background: #f0fdf4; border: 2px solid #10b981; padding: 15px; border-radius: 8px; color: #166534; }
+        .android-fix { background: #dbeafe; border: 1px solid #93c5fd; padding: 12px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🔧 Системная диагностика GPS</h2>
+            <p>Решение проблем на уровне Android</p>
+        </div>
+
+        <div class="critical">
+            <strong>🚨 КРИТИЧЕСКАЯ ПРОБЛЕМА:</strong> GPS заблокирован во всех браузерах.<br>
+            Это системная блокировка Android.
+        </div>
+
+        <!-- Системные настройки -->
+        <div class="card">
+            <h3>⚙️ Системные настройки Android</h3>
+            <div class="step">
+                <div class="step-title">1. Включите GPS в системе</div>
+                <div class="step-desc">
+                    <strong>Настройки → Местоположение → Включить</strong><br>
+                    Или: Быстрые настройки → GPS → Включить
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-title">2. Режим определения местоположения</div>
+                <div class="step-desc">
+                    <strong>Настройки → Местоположение → Режим</strong><br>
+                    Выберите: "Высокая точность" или "По всем источникам"
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-title">3. Разрешения для браузеров</div>
+                <div class="step-desc">
+                    <strong>Настройки → Приложения → [Браузер] → Разрешения → Местоположение</strong><br>
+                    Включите для всех браузеров
+                </div>
+            </div>
+        </div>
+
+        <!-- Проверка GPS -->
+        <div class="card">
+            <h3>🧪 Проверка GPS</h3>
+            <div id="gpsStatus" class="status status-warning">Готов к проверке</div>
+            <div id="coords" class="coords"></div>
+            <button id="testGps" class="btn btn-primary">🎯 Тест GPS</button>
+            <button id="checkPermissions" class="btn btn-warning">🔍 Проверить разрешения</button>
+        </div>
+
+        <!-- Пошаговое решение -->
+        <div class="card">
+            <h3>📋 Пошаговое решение</h3>
+            <div class="android-fix">
+                <strong>Для Samsung:</strong><br>
+                Настройки → Биометрия и безопасность → Другие настройки безопасности → Местоположение → Включить
+            </div>
+            <div class="android-fix">
+                <strong>Для Xiaomi/MIUI:</strong><br>
+                Настройки → Пароли и безопасность → Конфиденциальность → Местоположение → Включить
+            </div>
+            <div class="android-fix">
+                <strong>Для чистого Android:</strong><br>
+                Настройки → Конфиденциальность → Диспетчер разрешений → Местоположение → Включить для браузеров
+            </div>
+        </div>
+
+        <!-- Альтернативное решение -->
+        <div class="card">
+            <h3>🔄 Альтернативное решение</h3>
+            <div class="step">
+                <div class="step-title">Создать APK приложение</div>
+                <div class="step-desc">
+                    APK приложение будет иметь прямые разрешения GPS<br>
+                    и не зависит от браузерных ограничений
+                </div>
+            </div>
+            <button id="createApk" class="btn btn-success">📱 Создать APK</button>
+            <div id="apkStatus"></div>
+        </div>
+
+        <!-- Тестовый режим -->
+        <div class="card">
+            <h3>🎲 Тестовый режим</h3>
+            <p>Если GPS не работает, используйте тестовые координаты:</p>
+            <button id="mockGps" class="btn btn-warning">🎯 Имитация GPS</button>
+            <button id="manualInput" class="btn btn-primary">✏️ Ручной ввод координат</button>
+            <div id="manualInputForm" style="display: none;">
+                <input type="number" id="latInput" placeholder="Широта" step="0.000001" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="number" id="lngInput" placeholder="Долгота" step="0.000001" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
+                <button id="setCoords" class="btn btn-success">📍 Установить координаты</button>
+            </div>
+        </div>
+
+        <!-- Результаты -->
+        <div class="card">
+            <h3>📊 Результаты</h3>
+            <div id="results" class="status status-warning">Пока тестов не проводилось</div>
+        </div>
+    </div>
+
+    <script>
+        let currentLocation = null;
+
+        // Элементы
+        const gpsStatus = document.getElementById('gpsStatus');
+        const coords = document.getElementById('coords');
+        const results = document.getElementById('results');
+        const apkStatus = document.getElementById('apkStatus');
+        const manualInputForm = document.getElementById('manualInputForm');
+
+        // Показать статус
+        function showStatus(text, type, element = gpsStatus) {
+            element.className = `status status-${type}`;
+            element.textContent = text;
+        }
+
+        // Проверка разрешений
+        async function checkPermissions() {
+            showStatus('🔍 Проверка разрешений...', 'warning');
+            
+            const checks = [];
+            
+            // Проверка 1: Поддержка GPS
+            checks.push({
+                name: 'Поддержка GPS',
+                status: navigator.geolocation ? 'PASS' : 'FAIL',
+                details: navigator.geolocation ? 'API доступен' : 'API недоступен'
+            });
+            
+            // Проверка 2: Разрешения
+            if (navigator.permissions) {
+                try {
+                    const permission = await navigator.permissions.query({ name: 'geolocation' });
+                    checks.push({
+                        name: 'Разрешения браузера',
+                        status: permission.state === 'granted' ? 'PASS' : 'FAIL',
+                        details: `Статус: ${permission.state}`
+                    });
+                } catch (error) {
+                    checks.push({
+                        name: 'Разрешения браузера',
+                        status: 'ERROR',
+                        details: 'Ошибка проверки разрешений'
+                    });
+                }
+            }
+            
+            // Проверка 3: Контекст
+            checks.push({
+                name: 'Контекст безопасности',
+                status: window.isSecureContext ? 'PASS' : 'FAIL',
+                details: window.isSecureContext ? 'Безопасный' : 'Небезопасный'
+            });
+            
+            // Отображение результатов
+            let html = '<div style="font-size: 12px;">';
+            checks.forEach(check => {
+                const color = check.status === 'PASS' ? '#059669' : '#dc2626';
+                html += `<div style="margin: 5px 0; color: ${color};">
+                    <strong>${check.status}:</strong> ${check.name} - ${check.details}
+                </div>`;
+            });
+            html += '</div>';
+            
+            results.innerHTML = html;
+            showStatus('✅ Проверка завершена', 'success');
+        }
+
+        // Тест GPS
+        function testGPS() {
+            if (!navigator.geolocation) {
+                showStatus('❌ GPS не поддерживается', 'error');
+                return;
+            }
+
+            showStatus('🔍 Тестирование GPS...', 'warning');
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude, accuracy } = position.coords;
+                    currentLocation = { lat: latitude, lng: longitude };
+                    
+                    coords.innerHTML = `
+                        ✅ GPS РАБОТАЕТ!<br>
+                        Широта: ${latitude.toFixed(6)}<br>
+                        Долгота: ${longitude.toFixed(6)}<br>
+                        Точность: ±${accuracy.toFixed(0)}м
+                    `;
+                    
+                    showStatus('✅ GPS успешно работает!', 'success');
+                    
+                    results.innerHTML = `
+                        <div class="success">
+                            <strong>🎉 ПРОБЛЕМА РЕШЕНА!</strong><br>
+                            GPS теперь работает корректно!
+                        </div>
+                    `;
+                },
+                (error) => {
+                    let message = 'Ошибка GPS';
+                    let solution = '';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            message = '❌ Разрешение заблокировано';
+                            solution = 'Проверьте системные настройки Android';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message = '⚠️ GPS недоступен';
+                            solution = 'Включите GPS в быстрых настройках';
+                            break;
+                        case error.TIMEOUT:
+                            message = '⏱️ Время ожидания истекло';
+                            solution = 'Выйдите на открытое пространство';
+                            break;
+                    }
+                    
+                    showStatus(message, 'error');
+                    coords.innerHTML = `Ошибка: ${error.message}`;
+                    
+                    results.innerHTML = `
+                        <div class="critical">
+                            <strong>ERROR ${error.code}:</strong> ${message}<br>
+                            <strong>Решение:</strong> ${solution}
+                        </div>
+                    `;
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        // Имитация GPS
+        function mockGPS() {
+            const testLocations = [
+                { name: 'Красная площадь, Москва', lat: 55.7539, lng: 37.6208 },
+                { name: 'Эрмитаж, Санкт-Петербург', lat: 59.9398, lng: 30.3146 },
+                { name: 'Центр Новосибирска', lat: 55.0084, lng: 82.9357 }
+            ];
+            
+            const location = testLocations[Math.floor(Math.random() * testLocations.length)];
+            currentLocation = location;
+            
+            coords.innerHTML = `
+                🎲 ТЕСТОВЫЕ КООРДИНАТЫ<br>
+                Место: ${location.name}<br>
+                Широта: ${location.lat.toFixed(6)}<br>
+                Долгота: ${location.lng.toFixed(6)}<br>
+                Точность: ±5м (имитация)
+            `;
+            
+            showStatus('🎯 Тестовые координаты установлены', 'success');
+        }
+
+        // Ручной ввод координат
+        function toggleManualInput() {
+            const form = document.getElementById('manualInputForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Установить координаты
+        function setManualCoords() {
+            const lat = parseFloat(document.getElementById('latInput').value);
+            const lng = parseFloat(document.getElementById('lngInput').value);
+            
+            if (isNaN(lat) || isNaN(lng)) {
+                alert('Введите корректные координаты');
+                return;
+            }
+            
+            currentLocation = { lat, lng };
+            
+            coords.innerHTML = `
+                ✏️ РУЧНОЙ ВВОД<br>
+                Широта: ${lat.toFixed(6)}<br>
+                Долгота: ${lng.toFixed(6)}<br>
+                Точность: Введено вручную
+            `;
+            
+            showStatus('📍 Координаты установлены вручную', 'success');
+        }
+
+        // Создать APK
+        function createAPK() {
+            apkStatus.innerHTML = `
+                <div class="step">
+                    <div class="step-title">🔧 Создание APK приложения</div>
+                    <div class="step-desc">
+                        1. APK будет иметь прямые GPS разрешения<br>
+                        2. Не зависит от браузерных ограничений<br>
+                        3. Полный доступ к GPS датчикам<br>
+                        4. Работает автономно
+                    </div>
+                </div>
+                <div class="status status-warning">
+                    📦 Для создания APK нужен Android Studio<br>
+                    или используйте Capacitor Cloud Build
+                </div>
+            `;
+        }
+
+        // События
+        document.getElementById('testGps').addEventListener('click', testGPS);
+        document.getElementById('checkPermissions').addEventListener('click', checkPermissions);
+        document.getElementById('mockGps').addEventListener('click', mockGPS);
+        document.getElementById('manualInput').addEventListener('click', toggleManualInput);
+        document.getElementById('setCoords').addEventListener('click', setManualCoords);
+        document.getElementById('createApk').addEventListener('click', createAPK);
+
+        // Автоматическая проверка при загрузке
+        window.addEventListener('load', () => {
+            showStatus('🔧 Системная диагностика готова', 'warning');
+            setTimeout(checkPermissions, 2000);
+        });
+    </script>
+</body>
+</html>

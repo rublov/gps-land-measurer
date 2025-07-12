@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR-код для загрузки</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        .qr-container { margin: 20px 0; }
+        .instructions { background: #f0f0f0; padding: 15px; border-radius: 8px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h2>📱 Загрузка файла на телефон</h2>
+    
+    <div class="instructions">
+        <h3>🔗 Ссылка для загрузки:</h3>
+        <p><strong>file:///c:/Users/Зал Царства/dyad-apps/cozy-mongoose-slide/manual-mode.html</strong></p>
+        
+        <h3>📋 Инструкция:</h3>
+        <ol>
+            <li>Скопируйте файл manual-mode.html на телефон</li>
+            <li>Откройте через файловый менеджер</li>
+            <li>Выберите "Открыть с помощью" → Браузер</li>
+        </ol>
+    </div>
+
+    <div class="qr-container">
+        <h3>📊 QR-код (если нужен):</h3>
+        <div id="qr-code"></div>
+    </div>
+
+    <script>
+        // Простой QR-код генератор
+        function generateQR() {
+            const qrText = "file:///storage/emulated/0/Download/manual-mode.html";
+            const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrText)}`;
+            
+            document.getElementById('qr-code').innerHTML = `
+                <img src="${qrAPI}" alt="QR Code" style="border: 1px solid #ccc; padding: 10px;">
+                <p>Отсканируйте после загрузки файла</p>
+            `;
+        }
+        
+        generateQR();
+    </script>
+</body>
+</html>

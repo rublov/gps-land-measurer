@@ -3,7 +3,16 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Home, MapPin, Footprints, Calculator, History, Settings as SettingsIcon, Menu, X } from 'lucide-react';
+import { 
+  Home, 
+  MapPin, 
+  Footprints, 
+  Calculator, 
+  History, 
+  Settings as SettingsIcon, 
+  Menu, 
+  X 
+} from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { MadeWithDyad } from './made-with-dyad';
 import { useIsMobile } from '@/hooks/use-mobile';

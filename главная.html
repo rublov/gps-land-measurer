@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Землемер - Главная</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container { max-width: 600px; text-align: center; padding: 20px; }
+        .card { 
+            background: rgba(255, 255, 255, 0.1); 
+            padding: 40px; 
+            border-radius: 20px; 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        .btn { 
+            display: inline-block;
+            padding: 15px 30px; 
+            margin: 15px; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            min-width: 250px;
+        }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-3px); }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; transform: translateY(-3px); }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; transform: translateY(-3px); }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #4b5563; transform: translateY(-3px); }
+        .emoji { font-size: 64px; margin: 20px 0; }
+        .version { margin-top: 20px; font-size: 14px; opacity: 0.8; }
+        .status { 
+            background: rgba(16, 185, 129, 0.2); 
+            border: 1px solid #10b981; 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="emoji">🗺️</div>
+            <h1>Землемер</h1>
+            <p style="font-size: 18px; margin: 20px 0;">Измерение земельных участков</p>
+            
+            <div class="status">
+                <strong>✅ Приложение готово к работе!</strong><br>
+                Выберите режим измерения:
+            </div>
+            
+            <div style="margin: 30px 0;">
+                <a href="manual-mode.html" class="btn btn-success">
+                    ✏️ Ручной режим
+                </a>
+                <button onclick="tryReactApp()" class="btn btn-primary">
+                    🚀 Полная версия
+                </button>
+                <a href="простая-инструкция.html" class="btn btn-warning">
+                    📖 Инструкция
+                </a>
+                <a href="quick-apk.html" class="btn btn-secondary">
+                    📱 Создать APK
+                </a>
+            </div>
+            
+            <div class="version">
+                <strong>Доступные функции:</strong><br>
+                📍 GPS + ручной ввод координат<br>
+                📐 Расчет площади участков<br>
+                💾 Сохранение и история измерений<br>
+                📱 Создание APK для Android<br>
+                🗺️ Работа без интернета
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function tryReactApp() {
+            // Пробуем открыть React версию
+            const reactUrl = 'http://localhost:5173';
+            
+            // Проверяем, работает ли React сервер
+            fetch(reactUrl)
+                .then(response => {
+                    if (response.ok) {
+                        window.open(reactUrl, '_blank');
+                    } else {
+                        showReactInstructions();
+                    }
+                })
+                .catch(() => {
+                    showReactInstructions();
+                });
+        }
+
+        function showReactInstructions() {
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 1000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            dialog.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 90%; text-align: center; color: #333;">
+                    <h2 style="margin: 0 0 15px 0;">🚀 Полная React версия</h2>
+                    
+                    <p style="margin: 15px 0;">Для запуска полной версии нужно:</p>
+                    
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left;">
+                        <strong>1. Запустите батник:</strong><br>
+                        <code>запуск-главной.bat</code><br><br>
+                        
+                        <strong>2. Или в терминале:</strong><br>
+                        <code>npx vite</code><br><br>
+                        
+                        <strong>3. Откройте в браузере:</strong><br>
+                        <code>http://localhost:5173</code>
+                    </div>
+                    
+                    <p style="margin: 15px 0;"><strong>💡 Пока что используйте ручной режим - он полностью функционален!</strong></p>
+                    
+                    <div style="margin-top: 20px;">
+                        <button onclick="window.location.href='manual-mode.html'" style="padding: 10px 20px; margin: 5px; border: none; border-radius: 8px; background: #10b981; color: white; cursor: pointer; font-weight: bold;">
+                            ✏️ Ручной режим
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 10px 20px; margin: 5px; border: none; border-radius: 8px; background: #6b7280; color: white; cursor: pointer; font-weight: bold;">
+                            ❌ Закрыть
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(dialog);
+            
+            // Закрытие по клику вне диалога
+            dialog.addEventListener('click', (e) => {
+                if (e.target === dialog) {
+                    dialog.remove();
+                }
+            });
+        }
+
+        // Проверяем статус React сервера при загрузке
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                fetch('http://localhost:5173')
+                    .then(response => {
+                        if (response.ok) {
+                            const notification = document.createElement('div');
+                            notification.innerHTML = `
+                                <div style="position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 15px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000;">
+                                    <strong>✅ React сервер работает!</strong><br>
+                                    <a href="http://localhost:5173" target="_blank" style="color: #d1fae5; text-decoration: underline;">Открыть полную версию →</a>
+                                </div>
+                            `;
+                            
+                            document.body.appendChild(notification);
+                            
+                            setTimeout(() => {
+                                notification.remove();
+                            }, 5000);
+                        }
+                    })
+                    .catch(() => {
+                        // React сервер не работает - всё нормально
+                    });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

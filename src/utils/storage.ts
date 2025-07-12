@@ -1,22 +1,6 @@
-interface LatLng {
-  lat: number;
-  lng: number;
-}
+import { LatLng, Measurement, AppSettings } from '@/types';
 
-export interface Measurement {
-  id: string;
-  name: string;
-  areaSqMeters: number;
-  areaSotkas: number;
-  date: string; // ISO string
-  coordinates?: LatLng[]; // Optional, for GPS modes
-}
-
-export interface AppSettings {
-  language: string;
-  units: string; // e.g., 'sotkas_sqmeters'
-  mapType: 'roadmap' | 'satellite' | 'hybrid' | 'terrain';
-}
+export type { Measurement };
 
 const MEASUREMENTS_STORAGE_KEY = 'zemlemer_measurements';
 const SETTINGS_STORAGE_KEY = 'zemlemer_settings';

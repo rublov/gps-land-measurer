@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Точные координаты для тестирования</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-card { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .coordinates { background: #e3f2fd; padding: 10px; border-radius: 5px; font-family: monospace; }
+        .expected { background: #e8f5e8; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .formula { background: #fff3e0; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Точные тестовые координаты</h1>
+    <p>Основано на формулах от <strong>movable-type.co.uk</strong> и <strong>Wikipedia</strong></p>
+
+    <div class="test-card">
+        <h3>📐 Тест 1: Квадрат 10×10 метров (Москва)</h3>
+        <div class="coordinates">
+            <strong>Точные координаты:</strong><br>
+            Точка 1: 55.750000, 37.600000<br>
+            Точка 2: 55.750000, 37.600157  (≈10м восток)<br>
+            Точка 3: 55.750090, 37.600157  (≈10м север)<br>
+            Точка 4: 55.750090, 37.600000  (замыкание)
+        </div>
+        <div class="expected">
+            <strong>Ожидаемый результат:</strong> 100 м² ± 2%
+        </div>
+        <div class="formula">
+            <strong>Расчет:</strong><br>
+            1° долготы на 55° широты = 111,320 × cos(55°) ≈ 63,715 м<br>
+            10м = 10 ÷ 63,715 ≈ 0.000157°<br>
+            1° широты = 111,320 м<br>
+            10м = 10 ÷ 111,320 ≈ 0.000090°
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h3>📏 Тест 2: Прямоугольник 50×20 метров</h3>
+        <div class="coordinates">
+            <strong>Точные координаты:</strong><br>
+            Точка 1: 55.750000, 37.600000<br>
+            Точка 2: 55.750000, 37.600785  (≈50м восток)<br>
+            Точка 3: 55.750180, 37.600785  (≈20м север)<br>
+            Точка 4: 55.750180, 37.600000  (замыкание)
+        </div>
+        <div class="expected">
+            <strong>Ожидаемый результат:</strong> 1,000 м² ± 2%
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h3>🏠 Тест 3: Дачный участок 25×25 метров</h3>
+        <div class="coordinates">
+            <strong>Точные координаты:</strong><br>
+            Точка 1: 55.750000, 37.600000<br>
+            Точка 2: 55.750000, 37.600392  (≈25м восток)<br>
+            Точка 3: 55.750225, 37.600392  (≈25м север)<br>
+            Точка 4: 55.750225, 37.600000  (замыкание)
+        </div>
+        <div class="expected">
+            <strong>Ожидаемый результат:</strong> 625 м² ± 2% (6.25 соток)
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h3>🔺 Тест 4: Треугольник равносторонний</h3>
+        <div class="coordinates">
+            <strong>Точные координаты:</strong><br>
+            Точка 1: 55.750000, 37.600000<br>
+            Точка 2: 55.750000, 37.600314  (≈20м восток)<br>
+            Точка 3: 55.750173, 37.600157  (≈20м север, 10м восток)
+        </div>
+        <div class="expected">
+            <strong>Ожидаемый результат:</strong> ≈ 173 м² (треугольник со стороной 20м)
+        </div>
+    </div>
+
+    <script>
+        // Добавить функцию копирования координат
+        document.querySelectorAll('.coordinates').forEach(coord => {
+            coord.style.cursor = 'pointer';
+            coord.title = 'Нажмите для копирования';
+            coord.addEventListener('click', function() {
+                const text = this.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    this.style.background = '#c8e6c9';
+                    setTimeout(() => {
+                        this.style.background = '#e3f2fd';
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

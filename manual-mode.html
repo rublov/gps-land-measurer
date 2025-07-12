@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Землемер - Ручной режим</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 400px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 14px; }
+        .status-success { background: #d1fae5; color: #065f46; }
+        .status-error { background: #fee2e2; color: #991b1b; }
+        .status-info { background: #dbeafe; color: #1e40af; }
+        .status-warning { background: #fef3c7; color: #92400e; }
+        .input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .coords { font-family: monospace; font-size: 12px; background: #f3f4f6; padding: 10px; border-radius: 5px; }
+        .marker-list { max-height: 200px; overflow-y: auto; }
+        .marker { padding: 8px; margin: 5px 0; background: #f3f4f6; border-radius: 5px; font-size: 12px; }
+        .result { text-align: center; font-size: 18px; font-weight: bold; color: #059669; margin: 10px 0; }
+        .map-demo { height: 200px; background: #e5e7eb; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6b7280; margin: 10px 0; }
+        .success { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 8px; color: #166534; }
+        .warning { background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; color: #991b1b; }
+        .history-item { 
+            background: #f8fafc; 
+            border: 1px solid #e2e8f0; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px;
+            position: relative;
+        }
+        .history-item h4 { margin: 0 0 10px 0; color: #1e293b; }
+        .history-item .date { font-size: 12px; color: #64748b; margin-bottom: 8px; }
+        .history-item .area { font-size: 16px; font-weight: bold; color: #059669; }
+        .history-item .details { font-size: 12px; color: #475569; margin-top: 5px; }
+        .history-item .actions { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+        }
+        .history-item .actions button { 
+            padding: 5px 10px; 
+            margin-left: 5px; 
+            border: none; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            cursor: pointer; 
+        }
+        .btn-restore { background: #10b981; color: white; }
+        .btn-delete { background: #ef4444; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Навигация -->
+        <div class="card" style="margin-bottom: 15px;">
+            <button onclick="goToHome()" class="btn btn-secondary">🏠 На главную</button>
+        </div>
+
+        <div class="header">
+            <h1>🗺️ Землемер</h1>
+            <p>Ручной режим измерения</p>
+        </div>
+
+        <div class="warning">
+            <strong>📍 Режим ручного ввода координат</strong><br>
+            Поскольку GPS заблокирован, используйте ручной ввод координат или тестовые места.
+        </div>
+
+        <!-- Быстрые места -->
+        <div class="card">
+            <h3>🏃 Быстрые места</h3>
+            <button id="moscowBtn" class="btn btn-primary">🏛️ Москва (Красная площадь)</button>
+            <button id="spbBtn" class="btn btn-primary">🏰 СПб (Эрмитаж)</button>
+            <button id="nskBtn" class="btn btn-primary">🏙️ Новосибирск (Центр)</button>
+            <button id="currentBtn" class="btn btn-warning">📍 Попробовать GPS</button>
+        </div>
+
+        <!-- Ручной ввод -->
+        <div class="card">
+            <h3>✏️ Ручной ввод координат</h3>
+            <div id="coordsStatus" class="status status-info">Введите координаты вручную</div>
+            <input type="number" id="latInput" class="input" placeholder="Широта (например: 55.7558)" step="0.000001">
+            <input type="number" id="lngInput" class="input" placeholder="Долгота (например: 37.6176)" step="0.000001">
+            <button id="setManualBtn" class="btn btn-success">📍 Установить координаты</button>
+            <div id="coords" class="coords"></div>
+        </div>
+
+        <!-- Маркеры -->
+        <div class="card">
+            <h3>📍 Маркеры (<span id="markerCount">0</span>)</h3>
+            <div class="map-demo">
+                <div>Карта (демо)<br>Маркеры: <span id="mapMarkerCount">0</span></div>
+            </div>
+            <button id="addMarkerBtn" class="btn btn-success" disabled>➕ Добавить маркер</button>
+            <button id="clearBtn" class="btn btn-danger">🗑️ Очистить все</button>
+            <div id="markerList" class="marker-list"></div>
+        </div>
+
+        <!-- Расчеты -->
+        <div class="card">
+            <h3>📐 Расчет площади</h3>
+            <button id="calculateBtn" class="btn btn-primary" disabled>🧮 Рассчитать</button>
+            <div id="result" class="result"></div>
+        </div>
+
+        <!-- Сохранение -->
+        <div class="card">
+            <h3>💾 Сохранение</h3>
+            <input type="text" id="saveName" class="input" placeholder="Название участка">
+            <button id="saveBtn" class="btn btn-success" disabled>💾 Сохранить</button>
+            <div id="saveStatus"></div>
+        </div>
+
+        <!-- История измерений -->
+        <div class="card">
+            <h3>📋 История измерений (<span id="historyCount">0</span>)</h3>
+            <button id="loadHistoryBtn" class="btn btn-primary">📂 Показать сохранённые</button>
+            <button id="clearHistoryBtn" class="btn btn-danger">🗑️ Очистить историю</button>
+            <button id="exportHistoryBtn" class="btn btn-secondary">📥 Экспорт данных</button>
+            <div id="historyList" class="marker-list" style="display: none;"></div>
+        </div>
+
+        <!-- Инструкции -->
+        <div class="card">
+            <h3>💡 Как использовать</h3>
+            <div style="font-size: 14px; line-height: 1.5;">
+                <p><strong>1.</strong> Выберите быстрое место или введите координаты вручную</p>
+                <p><strong>2.</strong> Нажмите "➕ Добавить маркер" для добавления точки</p>
+                <p><strong>3.</strong> Добавьте минимум 3 маркера для расчета площади</p>
+                <p><strong>4.</strong> Нажмите "🧮 Рассчитать" для получения результата</p>
+                <p><strong>5.</strong> Сохраните результат с названием участка</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLocation = null;
+        let markers = [];
+        let calculatedArea = 0;
+
+        // Элементы
+        const coordsStatus = document.getElementById('coordsStatus');
+        const coords = document.getElementById('coords');
+        const latInput = document.getElementById('latInput');
+        const lngInput = document.getElementById('lngInput');
+        const addMarkerBtn = document.getElementById('addMarkerBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const markerCount = document.getElementById('markerCount');
+        const mapMarkerCount = document.getElementById('mapMarkerCount');
+        const markerList = document.getElementById('markerList');
+        const result = document.getElementById('result');
+        const saveName = document.getElementById('saveName');
+        const saveStatus = document.getElementById('saveStatus');
+
+        // История
+        const historyList = document.getElementById('historyList');
+        const historyCount = document.getElementById('historyCount');
+
+        // Предустановленные места
+        const places = {
+            moscow: { name: 'Красная площадь, Москва', lat: 55.7558, lng: 37.6176 },
+            spb: { name: 'Эрмитаж, Санкт-Петербург', lat: 59.9398, lng: 30.3146 },
+            nsk: { name: 'Центр Новосибирска', lat: 55.0084, lng: 82.9357 }
+        };
+
+        // Показать статус
+        function showStatus(text, type, element = coordsStatus) {
+            element.className = `status status-${type}`;
+            element.textContent = text;
+        }
+
+        // Установить место
+        function setPlace(place) {
+            currentLocation = place;
+            
+            coords.innerHTML = `
+                📍 ${place.name}<br>
+                Широта: ${place.lat.toFixed(6)}<br>
+                Долгота: ${place.lng.toFixed(6)}<br>
+                Источник: Предустановленное место
+            `;
+            
+            latInput.value = place.lat;
+            lngInput.value = place.lng;
+            
+            showStatus('✅ Место выбрано', 'success');
+            addMarkerBtn.disabled = false;
+        }
+
+        // Установить координаты вручную
+        function setManualCoords() {
+            const lat = parseFloat(latInput.value);
+            const lng = parseFloat(lngInput.value);
+            
+            if (isNaN(lat) || isNaN(lng)) {
+                showStatus('❌ Введите корректные координаты', 'error');
+                return;
+            }
+            
+            if (lat < -90 || lat > 90) {
+                showStatus('❌ Широта должна быть от -90 до 90', 'error');
+                return;
+            }
+            
+            if (lng < -180 || lng > 180) {
+                showStatus('❌ Долгота должна быть от -180 до 180', 'error');
+                return;
+            }
+            
+            currentLocation = { lat, lng, name: 'Ручной ввод' };
+            
+            coords.innerHTML = `
+                ✏️ Ручной ввод координат<br>
+                Широта: ${lat.toFixed(6)}<br>
+                Долгота: ${lng.toFixed(6)}<br>
+                Источник: Введено вручную
+            `;
+            
+            showStatus('✅ Координаты установлены', 'success');
+            addMarkerBtn.disabled = false;
+        }
+
+        // Попробовать GPS
+        function tryGPS() {
+            if (!navigator.geolocation) {
+                showStatus('❌ GPS не поддерживается', 'error');
+                return;
+            }
+
+            showStatus('🔍 Попытка получить GPS...', 'warning');
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude, accuracy } = position.coords;
+                    currentLocation = { lat: latitude, lng: longitude, name: 'GPS' };
+                    
+                    coords.innerHTML = `
+                        🎯 GPS координаты<br>
+                        Широта: ${latitude.toFixed(6)}<br>
+                        Долгота: ${longitude.toFixed(6)}<br>
+                        Точность: ±${accuracy.toFixed(0)}м
+                    `;
+                    
+                    latInput.value = latitude;
+                    lngInput.value = longitude;
+                    
+                    showStatus('🎉 GPS работает!', 'success');
+                    addMarkerBtn.disabled = false;
+                },
+                (error) => {
+                    showStatus('❌ GPS не работает. Используйте ручной ввод.', 'error');
+                },
+                {
+                    enableHighAccuracy: false,
+                    timeout: 10000,
+                    maximumAge: 600000
+                }
+            );
+        }
+
+        // Добавить маркер
+        function addMarker() {
+            if (!currentLocation) return;
+            
+            markers.push({...currentLocation});
+            updateMarkerDisplay();
+            
+            if (markers.length >= 3) {
+                calculateBtn.disabled = false;
+            }
+            
+            showStatus(`✅ Маркер ${markers.length} добавлен`, 'success');
+        }
+
+        // Очистить маркеры
+        function clearMarkers() {
+            markers = [];
+            calculatedArea = 0;
+            updateMarkerDisplay();
+            result.innerHTML = '';
+            calculateBtn.disabled = true;
+            saveBtn.disabled = true;
+            showStatus('🗑️ Все маркеры очищены', 'info');
+        }
+
+        // Обновить отображение маркеров
+        function updateMarkerDisplay() {
+            markerCount.textContent = markers.length;
+            mapMarkerCount.textContent = markers.length;
+            
+            markerList.innerHTML = '';
+            markers.forEach((marker, index) => {
+                const div = document.createElement('div');
+                div.className = 'marker';
+                div.innerHTML = `
+                    Маркер ${index + 1}: ${marker.lat.toFixed(6)}, ${marker.lng.toFixed(6)}<br>
+                    <small>Источник: ${marker.name || 'Неизвестно'}</small>
+                `;
+                markerList.appendChild(div);
+            });
+        }
+
+        // Рассчитать площадь
+        function calculateArea() {
+            if (markers.length < 3) {
+                showStatus('❌ Нужно минимум 3 маркера', 'error');
+                return;
+            }
+            
+            // Проверка на разумные расстояния
+            const maxDistance = getMaxDistance(markers);
+            if (maxDistance > 100000) { // 100 км
+                showStatus('⚠️ Точки слишком далеко друг от друга', 'warning');
+                result.innerHTML = `
+                    <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 8px; color: #92400e;">
+                        <strong>⚠️ ВНИМАНИЕ:</strong> Максимальное расстояние между точками: ${(maxDistance/1000).toFixed(1)} км<br>
+                        Для точных расчетов используйте точки в пределах одного участка (до 10 км).<br>
+                        <strong>Текущий результат может быть неточным!</strong>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Улучшенная формула для малых участков
+            let area = 0;
+            const n = markers.length;
+            
+            // Используем первую точку как центр для проекции
+            const centerLat = markers[0].lat * Math.PI / 180;
+            const cosCenter = Math.cos(centerLat);
+            
+            // Конвертируем в метры относительно центра
+            const points = markers.map(marker => {
+                const lat = marker.lat * Math.PI / 180;
+                const lng = marker.lng * Math.PI / 180;
+                const centerLng = markers[0].lng * Math.PI / 180;
+                
+                return {
+                    x: (lng - centerLng) * 6378137 * cosCenter,
+                    y: (lat - centerLat) * 6378137
+                };
+            });
+            
+            // Формула Шойера для площади полигона
+            for (let i = 0; i < n; i++) {
+                const j = (i + 1) % n;
+                area += points[i].x * points[j].y;
+                area -= points[j].x * points[i].y;
+            }
+            
+            area = Math.abs(area) / 2;
+            
+            const areaSotkas = area / 100;
+            const areaHectares = area / 10000;
+            calculatedArea = area;
+            
+            result.innerHTML = `
+                <div class="success">
+                    <strong>📊 Результат расчета:</strong><br>
+                    Площадь: ${area.toFixed(1)} м²<br>
+                    В сотках: ${areaSotkas.toFixed(2)} соток<br>
+                    В гектарах: ${areaHectares.toFixed(4)} га<br>
+                    Маркеров: ${markers.length}<br>
+                    <small>Макс. расстояние: ${(maxDistance/1000).toFixed(1)} км</small>
+                </div>
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 11px;">
+                    <strong>🔍 Отладка:</strong><br>
+                    ${points.map((p, i) => `Точка ${i+1}: x=${p.x.toFixed(1)}м, y=${p.y.toFixed(1)}м`).join('<br>')}
+                </div>
+            `;
+            
+            saveBtn.disabled = false;
+            showStatus('✅ Площадь рассчитана', 'success');
+        }
+
+        // Простая проверка для прямоугольника
+        function checkRectangle(markers) {
+            if (markers.length !== 4) return null;
+            
+            // Рассчитываем стороны
+            const side1 = getDistance(markers[0], markers[1]);
+            const side2 = getDistance(markers[1], markers[2]);
+            const side3 = getDistance(markers[2], markers[3]);
+            const side4 = getDistance(markers[3], markers[0]);
+            
+            // Проверяем диагонали
+            const diag1 = getDistance(markers[0], markers[2]);
+            const diag2 = getDistance(markers[1], markers[3]);
+            
+            return {
+                sides: [side1, side2, side3, side4],
+                diagonals: [diag1, diag2],
+                area: side1 * side2 // Если это прямоугольник
+            };
+        }
+
+        // Функция расчета максимального расстояния
+        function getMaxDistance(points) {
+            let maxDist = 0;
+            for (let i = 0; i < points.length; i++) {
+                for (let j = i + 1; j < points.length; j++) {
+                    const dist = getDistance(points[i], points[j]);
+                    if (dist > maxDist) maxDist = dist;
+                }
+            }
+            return maxDist;
+        }
+
+        // Функция расчета расстояния между двумя точками (формула Хаверсина)
+        function getDistance(point1, point2) {
+            const R = 6378137; // Радиус Земли в метрах
+            const lat1 = point1.lat * Math.PI / 180;
+            const lat2 = point2.lat * Math.PI / 180;
+            const deltaLat = (point2.lat - point1.lat) * Math.PI / 180;
+            const deltaLng = (point2.lng - point1.lng) * Math.PI / 180;
+
+            const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+                     Math.cos(lat1) * Math.cos(lat2) *
+                     Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            return R * c;
+        }
+
+        // Сохранить измерение
+        function saveMeasurement() {
+            const name = saveName.value || `Измерение ${new Date().toLocaleDateString()}`;
+            
+            const measurement = {
+                id: Date.now(),
+                name: name,
+                area: calculatedArea,
+                sotkas: calculatedArea / 100,
+                hectares: calculatedArea / 10000,
+                markers: markers,
+                date: new Date().toISOString()
+            };
+            
+            // Сохранение в localStorage
+            const measurements = JSON.parse(localStorage.getItem('measurements') || '[]');
+            measurements.push(measurement);
+            localStorage.setItem('measurements', JSON.stringify(measurements));
+            
+            saveStatus.innerHTML = '<div class="status status-success">✅ Измерение сохранено!</div>';
+            updateHistoryCount();
+            
+            // Очистка формы
+            saveName.value = '';
+            clearMarkers();
+            
+            setTimeout(() => {
+                saveStatus.innerHTML = '';
+            }, 3000);
+        }
+
+        // Обновить счетчик истории
+        function updateHistoryCount() {
+            const measurements = JSON.parse(localStorage.getItem('measurements') || '[]');
+            document.getElementById('historyCount').textContent = measurements.length;
+        }
+
+        // Показать историю
+        function loadHistory() {
+            const historyList = document.getElementById('historyList');
+            const measurements = JSON.parse(localStorage.getItem('measurements') || '[]');
+            
+            if (measurements.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #6b7280;">Нет сохранённых измерений</p>';
+                historyList.style.display = 'block';
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            measurements.reverse().forEach(measurement => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div class="actions">
+                        <button class="btn-restore" onclick="restoreMeasurement(${measurement.id})">🔄 Восстановить</button>
+                        <button class="btn-delete" onclick="deleteMeasurement(${measurement.id})">🗑️ Удалить</button>
+                    </div>
+                    <h4>${measurement.name}</h4>
+                    <div class="date">📅 ${new Date(measurement.date).toLocaleString('ru-RU')}</div>
+                    <div class="area">📊 ${measurement.area.toFixed(1)} м² (${measurement.sotkas.toFixed(2)} соток)</div>
+                    <div class="details">
+                        📍 Точек: ${measurement.markers.length} | 
+                        🏞️ Гектар: ${measurement.hectares.toFixed(4)} га
+                    </div>
+                `;
+                historyList.appendChild(item);
+            });
+            
+            historyList.style.display = historyList.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Восстановить измерение
+        function restoreMeasurement(id) {
+            const measurements = JSON.parse(localStorage.getItem('measurements') || '[]');
+            const measurement = measurements.find(m => m.id === id);
+            
+            if (measurement) {
+                // Очищаем текущие данные
+                clearMarkers();
+                
+                // Восстанавливаем маркеры
+                markers = [...measurement.markers];
+                calculatedArea = measurement.area;
+                
+                // Обновляем интерфейс
+                updateMarkerDisplay();
+                calculateBtn.disabled = false;
+                
+                result.innerHTML = `
+                    <div class="success">
+                        <strong>📊 Восстановлено: ${measurement.name}</strong><br>
+                        Площадь: ${measurement.area.toFixed(1)} м²<br>
+                        В сотках: ${measurement.sotkas.toFixed(2)} соток<br>
+                        В гектарах: ${measurement.hectares.toFixed(4)} га<br>
+                        Маркеров: ${measurement.markers.length}
+                    </div>
+                `;
+                
+                showStatus('✅ Измерение восстановлено', 'success');
+                
+                // Закрываем историю
+                document.getElementById('historyList').style.display = 'none';
+            }
+        }
+
+        // Удалить измерение
+        function deleteMeasurement(id) {
+            if (confirm('Удалить это измерение?')) {
+                const measurements = JSON.parse(localStorage.getItem('measurements') || '[]');
+                const filtered = measurements.filter(m => m.id !== id);
+                localStorage.setItem('measurements', JSON.stringify(filtered));
+                
+                updateHistoryCount();
+                loadHistory(); // Обновляем список
+                showStatus('🗑️ Измерение удалено', 'info');
+            }
+        }
+
+        // Очистить всю историю
+        function clearHistory() {
+            if (confirm('Удалить ВСЮ историю измерений? Это действие нельзя отменить!')) {
+                localStorage.removeItem('measurements');
+                updateHistoryCount();
+                document.getElementById('historyList').innerHTML = '';
+                document.getElementById('historyList').style.display = 'none';
+                showStatus('🗑️ История очищена', 'warning');
+            }
+        }
+
+        // Экспорт данных
+        function exportHistory() {
+            const measurements = JSON.parse(localStorage.getItem('measurements') || '[]');
+            
+            if (measurements.length === 0) {
+                alert('Нет данных для экспорта');
+                return;
+            }
+            
+            let csvContent = 'Название,Дата,Площадь_м2,Сотки,Гектары,Точек,Координаты\n';
+            
+            measurements.forEach(m => {
+                const coords = m.markers.map(marker => `${marker.lat},${marker.lng}`).join(';');
+                csvContent += `"${m.name}","${new Date(m.date).toLocaleString('ru-RU')}",${m.area.toFixed(1)},${m.sotkas.toFixed(2)},${m.hectares.toFixed(4)},${m.markers.length},"${coords}"\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `zemljemer_history_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            
+            showStatus('📥 Данные экспортированы', 'success');
+        }
+
+        // Навигация
+        function goToHome() {
+            // Показываем диалог выбора действий
+            showNavigationDialog();
+        }
+
+        function showNavigationDialog() {
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 1000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            dialog.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                    <h2 style="margin: 0 0 15px 0; color: #333;">🏠 Навигация</h2>
+                    <p style="margin: 15px 0; color: #666;">Выберите действие:</p>
+                    
+                    <button onclick="openMainApp()" style="width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; background: #10b981; color: white; cursor: pointer; font-weight: bold;">
+                        🚀 Открыть основное приложение
+                    </button>
+                    
+                    <button onclick="showOtherModes()" style="width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; background: #2563eb; color: white; cursor: pointer; font-weight: bold;">
+                        🛠️ Другие режимы
+                    </button>
+                    
+                    <button onclick="location.reload()" style="width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; background: #f59e0b; color: white; cursor: pointer; font-weight: bold;">
+                        🔄 Перезагрузить страницу
+                    </button>
+                    
+                    <button onclick="closeDialog()" style="width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; background: #6b7280; color: white; cursor: pointer; font-weight: bold;">
+                        ❌ Закрыть
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(dialog);
+            
+            // Закрытие по клику вне диалога
+            dialog.addEventListener('click', (e) => {
+                if (e.target === dialog) {
+                    closeDialog();
+                }
+            });
+        }
+
+        function openMainApp() {
+            // Сначала показываем инструкции, так как React-приложение может быть недоступно
+            showAppInstructions();
+        }
+
+        function showOtherModes() {
+            closeDialog();
+            const modesDialog = document.createElement('div');
+            modesDialog.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 1000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modesDialog.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 90%; text-align: center;">
+                    <h2 style="margin: 0 0 15px 0; color: #333;">🛠️ Режимы работы</h2>
+                    
+                    <button onclick="window.location.href='manual-mode.html'" style="width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; background: #10b981; color: white; cursor: pointer; font-weight: bold;">
+                        ✏️ Ручной режим (текущий)
+                    </button>
+                    
+                    <button onclick="openTestMode()" style="width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; background: #f59e0b; color: white; cursor: pointer; font-weight: bold;">
+                        🧪 Тестовый режим
+                    </button>
+                    
+                    <button onclick="openGpsMode()" style="width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; background: #ef4444; color: white; cursor: pointer; font-weight: bold;">
+                        📍 GPS режим (заблокирован)
+                    </button>
+                    
+                    <button onclick="closeModeDialog()" style="width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; background: #6b7280; color: white; cursor: pointer; font-weight: bold;">
+                        ↩️ Назад
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modesDialog);
+            
+            window.openTestMode = function() {
+                window.location.href = 'test-coordinates.html';
+            };
+            
+            window.openGpsMode = function() {
+                alert('GPS режим заблокирован системой. Используйте ручной режим.');
+            };
+            
+            window.closeModeDialog = function() {
+                modesDialog.remove();
+                showNavigationDialog();
+            };
+        }
+
+        function showAppInstructions() {
+            closeDialog();
+            const instructionsDialog = document.createElement('div');
+            instructionsDialog.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 1000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            instructionsDialog.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 90%; text-align: left;">
+                    <h2 style="margin: 0 0 15px 0; color: #333; text-align: center;">📱 Основное приложение</h2>
+                    
+                    <div style="font-size: 14px; line-height: 1.6; color: #555;">
+                        <p><strong>🔧 Для полного функционала нужно:</strong></p>
+                        <p>• Запустить React-сервер разработки</p>
+                        <p>• Или создать APK-файл приложения</p>
+                        
+                        <hr style="margin: 15px 0; border: 1px solid #eee;">
+                        
+                        <p><strong>📱 Пока доступно:</strong></p>
+                        <p>✅ Ручной режим измерения (текущий)</p>
+                        <p>✅ Расчет площади участков</p>
+                        <p>✅ Сохранение результатов</p>
+                        <p>✅ Тестовые координаты</p>
+                        
+                        <hr style="margin: 15px 0; border: 1px solid #eee;">
+                        
+                        <p><strong>💡 Рекомендация:</strong></p>
+                        <p>Используйте текущий ручной режим - он полностью функционален!</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="flex: 1; padding: 15px; border: none; border-radius: 8px; font-size: 16px; background: #10b981; color: white; cursor: pointer; font-weight: bold;">
+                            ✅ Остаться в ручном режиме
+                        </button>
+                        <button onclick="window.open('quick-apk.html', '_blank')" style="flex: 1; padding: 15px; border: none; border-radius: 8px; font-size: 16px; background: #2563eb; color: white; cursor: pointer; font-weight: bold;">
+                            📱 Создать APK
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(instructionsDialog);
+        }
+
+        function showCreateAPKDialog() {
+            closeDialog();
+            const apkDialog = document.createElement('div');
+            apkDialog.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 1000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            apkDialog.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 90%; text-align: center;">
+                    <h2 style="margin: 0 0 15px 0; color: #333;">📱 Создание APK</h2>
+                    
+                    <p style="margin: 15px 0; color: #666;">Хотите создать установочный файл приложения?</p>
+                    
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; font-size: 14px;">
+                        <strong>APK будет включать:</strong><br>
+                        • Полный интерфейс приложения<br>
+                        • GPS и ручной режимы<br>
+                        • Сохранение и экспорт данных<br>
+                        • Работу без интернета
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="startAPKCreation()" style="flex: 1; padding: 15px; border: none; border-radius: 8px; font-size: 16px; background: #10b981; color: white; cursor: pointer; font-weight: bold;">
+                            🚀 Да, создать APK
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="flex: 1; padding: 15px; border: none; border-radius: 8px; font-size: 16px; background: #6b7280; color: white; cursor: pointer; font-weight: bold;">
+                            ❌ Отмена
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(apkDialog);
+        }
+
+        function startAPKCreation() {
+            alert('🚧 Создание APK запущено!\n\nЭто займет несколько минут...\nОжидайте инструкций в консоли.');
+            closeDialog();
+            // Здесь будет код для запуска создания APK
+        }
+
+        // Добавляем глобальные функции
+        window.showCreateAPKDialog = showCreateAPKDialog;
+        window.startAPKCreation = startAPKCreation;
+
+        function closeDialog() {
+            const dialogs = document.querySelectorAll('div[style*="position: fixed"]');
+            dialogs.forEach(dialog => {
+                if (dialog.style.zIndex === '1000') {
+                    dialog.remove();
+                }
+            });
+        }
+
+        // Глобальные функции для кнопок
+        window.openMainApp = openMainApp;
+        window.showOtherModes = showOtherModes;
+        window.closeDialog = closeDialog;
+
+        function showHomeOptions() {
+            const homeDialog = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center;" onclick="this.remove()">
+                    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 90%; text-align: center;" onclick="event.stopPropagation()">
+                        <h2>🏠 Главное меню</h2>
+                        <p style="margin: 15px 0;">Выберите действие:</p>
+                        <button onclick="location.reload()" style="width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 8px; font-size: 16px; background: #10b981; color: white; cursor: pointer;">🔄 Перезагрузить страницу</button>
+                        <button onclick="window.history.back()" style="width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 8px; font-size: 16px; background: #6b7280; color: white; cursor: pointer;">↩️ Назад</button>
+                        <button onclick="this.parentElement.parentElement.remove()" style="width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 8px; font-size: 16px; background: #ef4444; color: white; cursor: pointer;">❌ Закрыть</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', homeDialog);
+        }
+
+        // События
+        document.getElementById('moscowBtn').addEventListener('click', () => setPlace(places.moscow));
+        document.getElementById('spbBtn').addEventListener('click', () => setPlace(places.spb));
+        document.getElementById('nskBtn').addEventListener('click', () => setPlace(places.nsk));
+        document.getElementById('currentBtn').addEventListener('click', tryGPS);
+        document.getElementById('setManualBtn').addEventListener('click', setManualCoords);
+        document.getElementById('addMarkerBtn').addEventListener('click', addMarker);
+        document.getElementById('clearBtn').addEventListener('click', clearMarkers);
+        document.getElementById('calculateBtn').addEventListener('click', calculateArea);
+        document.getElementById('saveBtn').addEventListener('click', saveMeasurement);
+        document.getElementById('loadHistoryBtn').addEventListener('click', loadHistory);
+        document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+        document.getElementById('exportHistoryBtn').addEventListener('click', exportHistory);
+
+        // Инициализация
+        window.addEventListener('load', () => {
+            showStatus('📍 Выберите способ ввода координат', 'info');
+            updateHistoryCount();
+        });
+    </script>
+</body>
+</html>

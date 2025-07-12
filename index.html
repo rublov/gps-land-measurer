@@ -1,13 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dyad-generated-app</title>
-    <script async
-      defer
-      src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=geometry&callback=initMap">
-    </script>
+    <title>Землемер - GPS измерение участков</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="description" content="Современное приложение для точного измерения площади земельных участков с помощью GPS" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Землемер" />
+    <!-- Разрешения для GPS -->
+    <meta http-equiv="Permissions-Policy" content="geolocation=(self)" />
+    <meta http-equiv="Feature-Policy" content="geolocation 'self'" />
+    <!-- Google Maps будет загружаться динамически из приложения -->
   </head>
 
   <body>

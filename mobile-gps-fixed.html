@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🔧 Землемер GPS - Исправленная версия</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            display: inline-block;
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-primary:active {
+            background: linear-gradient(45deg, #218838, #1da88a);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #e83e8c);
+            border: none;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+        
+        .btn-danger:active {
+            background: linear-gradient(45deg, #c82333, #d91a72);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            border: none;
+            color: #212529;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+        }
+        
+        .btn-warning:active {
+            background: linear-gradient(45deg, #e0a800, #e8590c);
+        }
+        
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .btn-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .coords {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        
+        .accuracy {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .accuracy.good { background: #28a745; }
+        .accuracy.ok { background: #ffc107; color: #212529; }
+        .accuracy.bad { background: #dc3545; }
+        
+        .markers-list {
+            max-height: 200px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .marker-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 6px;
+            margin: 5px 0;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .results {
+            background: rgba(40, 167, 69, 0.3);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+        }
+        
+        .warning {
+            background: rgba(255, 193, 7, 0.3);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            color: #212529;
+        }
+        
+        .hidden { display: none; }
+        
+        .debug-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            margin-top: 10px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Землемер GPS</h1>
+            <p>Исправленная мобильная версия</p>
+        </div>
+        
+        <!-- GPS статус -->
+        <div class="card">
+            <div class="status">
+                <strong>GPS Статус:</strong> <span id="gpsStatus">Готов к работе</span>
+            </div>
+            
+            <div class="btn-grid">
+                <button class="btn btn-primary" onclick="startAccurateGPS()">
+                    🎯 Точный GPS
+                </button>
+                <button class="btn" onclick="startBasicGPS()">
+                    📡 Быстрый GPS
+                </button>
+            </div>
+            
+            <div id="coordinates" class="coords hidden">
+                <div>📍 <span id="coordsText">-</span></div>
+                <div>Точность: <span id="accuracy" class="accuracy">-</span></div>
+            </div>
+            
+            <div id="warning" class="card warning hidden">
+                ⚠️ Низкая точность GPS! Рекомендуется выйти на улицу или подойти к окну.
+            </div>
+        </div>
+        
+        <!-- Управление маркерами -->
+        <div class="card">
+            <div class="btn-grid-3">
+                <button id="addBtn" class="btn btn-primary" onclick="addMarker()" disabled>
+                    📍 Добавить
+                </button>
+                <button id="clearBtn" class="btn btn-danger" onclick="clearMarkers()" disabled>
+                    🗑️ Очистить
+                </button>
+                <button id="calcBtn" class="btn btn-warning" onclick="calculateArea()" disabled>
+                    📐 Площадь
+                </button>
+            </div>
+            
+            <div class="status">
+                Маркеров: <span id="markerCount">0</span>
+            </div>
+        </div>
+        
+        <!-- Список маркеров -->
+        <div id="markersList" class="card hidden">
+            <h4>📍 Маркеры:</h4>
+            <div id="markersContainer" class="markers-list"></div>
+        </div>
+        
+        <!-- Результаты -->
+        <div id="results" class="card results hidden">
+            <h4>📊 Результат измерения:</h4>
+            <div id="areaResults"></div>
+        </div>
+        
+        <!-- Отладочная информация -->
+        <div id="debugInfo" class="debug-info">
+            📝 Лог действий:<br>
+            <span id="debugLog">Приложение загружено</span>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let currentLocation = null;
+        let gpsAccuracy = null;
+        let markers = [];
+        let debugMessages = ['Приложение загружено'];
+        
+        // Функции для отладки
+        function addDebugMessage(message) {
+            debugMessages.push(new Date().toLocaleTimeString() + ': ' + message);
+            if (debugMessages.length > 10) {
+                debugMessages.shift();
+            }
+            document.getElementById('debugLog').innerHTML = debugMessages.join('<br>');
+            console.log('DEBUG:', message);
+        }
+        
+        // Обновление статуса
+        function updateStatus(message, isError = false) {
+            const statusEl = document.getElementById('gpsStatus');
+            statusEl.textContent = message;
+            statusEl.className = isError ? 'pulse' : '';
+            addDebugMessage('Статус: ' + message);
+        }
+        
+        // Вибрация (если поддерживается)
+        function vibrate(pattern = 100) {
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate(pattern);
+                    addDebugMessage('Вибрация: ' + pattern);
+                }
+            } catch (e) {
+                addDebugMessage('Вибрация недоступна: ' + e.message);
+            }
+        }
+        
+        // Обновление координат
+        function updateCoordinates(lat, lng, accuracy) {
+            currentLocation = { lat, lng };
+            gpsAccuracy = accuracy;
+            
+            document.getElementById('coordsText').textContent = 
+                `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            
+            const accuracyEl = document.getElementById('accuracy');
+            accuracyEl.textContent = `±${accuracy.toFixed(0)}м`;
+            
+            // Цветовая индикация точности
+            accuracyEl.className = 'accuracy ';
+            if (accuracy <= 10) {
+                accuracyEl.className += 'good';
+            } else if (accuracy <= 100) {
+                accuracyEl.className += 'ok';
+            } else {
+                accuracyEl.className += 'bad';
+            }
+            
+            document.getElementById('coordinates').classList.remove('hidden');
+            document.getElementById('addBtn').disabled = false;
+            
+            // Показать предупреждение при плохой точности
+            const warningEl = document.getElementById('warning');
+            if (accuracy > 1000) {
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+            
+            addDebugMessage(`Координаты получены: ${lat.toFixed(6)}, ${lng.toFixed(6)} (±${accuracy.toFixed(0)}м)`);
+            vibrate(100);
+        }
+        
+        // Точный GPS с несколькими попытками
+        function startAccurateGPS() {
+            addDebugMessage('Запуск точного GPS');
+            
+            if (!navigator.geolocation) {
+                updateStatus('GPS не поддерживается', true);
+                addDebugMessage('Геолокация не поддерживается браузером');
+                return;
+            }
+            
+            updateStatus('🎯 Поиск точного GPS...');
+            
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 60000,
+                maximumAge: 0
+            };
+            
+            let attempts = 0;
+            const maxAttempts = 5;
+            let bestAccuracy = Infinity;
+            let bestPosition = null;
+            
+            function tryGPS() {
+                attempts++;
+                addDebugMessage(`GPS попытка ${attempts}/${maxAttempts}`);
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude, accuracy } = position.coords;
+                        addDebugMessage(`GPS ответ: ${latitude.toFixed(6)}, ${longitude.toFixed(6)} (±${accuracy.toFixed(0)}м)`);
+                        
+                        if (accuracy < bestAccuracy) {
+                            bestAccuracy = accuracy;
+                            bestPosition = position;
+                            updateCoordinates(latitude, longitude, accuracy);
+                        }
+                        
+                        if (accuracy <= 10 || attempts >= maxAttempts) {
+                            updateStatus('✅ GPS получен!');
+                            addDebugMessage(`Лучший результат: ±${bestAccuracy.toFixed(0)}м`);
+                            return;
+                        }
+                        
+                        updateStatus(`🔄 Улучшаем точность... (${attempts}/${maxAttempts})`);
+                        setTimeout(tryGPS, 2000);
+                    },
+                    (error) => {
+                        addDebugMessage(`GPS ошибка ${attempts}: ${error.message} (код: ${error.code})`);
+                        
+                        if (attempts < maxAttempts) {
+                            updateStatus(`❌ Ошибка, повтор... (${attempts}/${maxAttempts})`);
+                            setTimeout(tryGPS, 3000);
+                        } else {
+                            updateStatus('❌ GPS недоступен', true);
+                            addDebugMessage('Все попытки GPS исчерпаны');
+                        }
+                    },
+                    options
+                );
+            }
+            
+            tryGPS();
+        }
+        
+        // Быстрый GPS
+        function startBasicGPS() {
+            addDebugMessage('Запуск быстрого GPS');
+            
+            if (!navigator.geolocation) {
+                updateStatus('GPS не поддерживается', true);
+                return;
+            }
+            
+            updateStatus('📡 Получение GPS...');
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude, accuracy } = position.coords;
+                    updateCoordinates(latitude, longitude, accuracy);
+                    updateStatus('✅ GPS получен!');
+                },
+                (error) => {
+                    addDebugMessage(`Быстрый GPS ошибка: ${error.message} (код: ${error.code})`);
+                    updateStatus('❌ Ошибка GPS', true);
+                },
+                {
+                    enableHighAccuracy: false,
+                    timeout: 30000,
+                    maximumAge: 300000
+                }
+            );
+        }
+        
+        // Добавить маркер
+        function addMarker() {
+            if (!currentLocation) {
+                updateStatus('❌ Нет GPS координат', true);
+                addDebugMessage('Попытка добавить маркер без координат');
+                return;
+            }
+            
+            const newMarker = {
+                lat: currentLocation.lat,
+                lng: currentLocation.lng,
+                accuracy: gpsAccuracy,
+                time: new Date().toLocaleTimeString()
+            };
+            
+            markers.push(newMarker);
+            addDebugMessage(`Маркер ${markers.length} добавлен: ${newMarker.lat.toFixed(6)}, ${newMarker.lng.toFixed(6)}`);
+            
+            updateMarkersList();
+            updateButtons();
+            vibrate([100, 50, 100]);
+        }
+        
+        // Обновить список маркеров
+        function updateMarkersList() {
+            const count = markers.length;
+            document.getElementById('markerCount').textContent = count;
+            
+            const listEl = document.getElementById('markersList');
+            const containerEl = document.getElementById('markersContainer');
+            
+            if (count > 0) {
+                listEl.classList.remove('hidden');
+                containerEl.innerHTML = '';
+                
+                markers.forEach((marker, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'marker-item';
+                    div.innerHTML = `
+                        📍 Точка ${index + 1} (${marker.time})<br>
+                        ${marker.lat.toFixed(6)}, ${marker.lng.toFixed(6)}<br>
+                        Точность: ±${marker.accuracy.toFixed(0)}м
+                    `;
+                    containerEl.appendChild(div);
+                });
+            } else {
+                listEl.classList.add('hidden');
+            }
+            
+            addDebugMessage(`Список маркеров обновлен: ${count} маркеров`);
+        }
+        
+        // Обновить состояние кнопок
+        function updateButtons() {
+            document.getElementById('calcBtn').disabled = markers.length < 3;
+            document.getElementById('clearBtn').disabled = markers.length === 0;
+        }
+        
+        // Очистить маркеры
+        function clearMarkers() {
+            markers = [];
+            updateMarkersList();
+            updateButtons();
+            document.getElementById('results').classList.add('hidden');
+            addDebugMessage('Все маркеры очищены');
+            vibrate(200);
+        }
+        
+        // Рассчитать площадь
+        function calculateArea() {
+            if (markers.length < 3) {
+                updateStatus('❌ Нужно минимум 3 точки', true);
+                addDebugMessage('Недостаточно точек для расчета площади');
+                return;
+            }
+            
+            addDebugMessage(`Начинаем расчет площади для ${markers.length} точек`);
+            
+            // Формула Шулейса для расчета площади многоугольника
+            let area = 0;
+            const n = markers.length;
+            
+            for (let i = 0; i < n; i++) {
+                const j = (i + 1) % n;
+                area += markers[i].lat * markers[j].lng;
+                area -= markers[j].lat * markers[i].lng;
+            }
+            
+            area = Math.abs(area) / 2;
+            
+            // Конвертация в квадратные метры (приблизительная)
+            // Учитываем что 1 градус широты ≈ 111,139 м
+            const areaSqMeters = area * 111139 * 111139 * Math.cos(markers[0].lat * Math.PI / 180);
+            const areaSotkas = areaSqMeters / 100;
+            
+            addDebugMessage(`Площадь рассчитана: ${areaSqMeters.toFixed(1)} м² (${areaSotkas.toFixed(2)} соток)`);
+            
+            document.getElementById('areaResults').innerHTML = `
+                <div><strong>Площадь:</strong> ${areaSqMeters.toFixed(1)} м²</div>
+                <div><strong>В сотках:</strong> ${areaSotkas.toFixed(2)} соток</div>
+                <div><strong>Точек:</strong> ${markers.length}</div>
+                <div><strong>Время:</strong> ${new Date().toLocaleTimeString()}</div>
+            `;
+            
+            document.getElementById('results').classList.remove('hidden');
+            vibrate([100, 50, 100, 50, 100]);
+        }
+        
+        // Инициализация при загрузке
+        window.addEventListener('load', function() {
+            addDebugMessage('Страница загружена');
+            
+            if (navigator.geolocation) {
+                updateStatus('GPS поддерживается. Нажмите кнопку.');
+                addDebugMessage('Геолокация поддерживается');
+            } else {
+                updateStatus('GPS не поддерживается браузером', true);
+                addDebugMessage('Геолокация НЕ поддерживается');
+            }
+            
+            // Проверяем возможности устройства
+            addDebugMessage('User Agent: ' + navigator.userAgent.substring(0, 50) + '...');
+            addDebugMessage('Платформа: ' + navigator.platform);
+            addDebugMessage('Вибрация: ' + (navigator.vibrate ? 'да' : 'нет'));
+            
+            // Предотвращаем зум при двойном касании
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            addDebugMessage('Приложение готово к работе');
+        });
+        
+        // Обработка ошибок
+        window.addEventListener('error', function(e) {
+            addDebugMessage('ОШИБКА: ' + e.message);
+            updateStatus('❌ Ошибка приложения', true);
+        });
+        
+        // Предотвращение случайного закрытия
+        window.addEventListener('beforeunload', function(e) {
+            if (markers.length > 0) {
+                e.preventDefault();
+                e.returnValue = 'У вас есть несохраненные маркеры. Закрыть?';
+            }
+        });
+    </script>
+</body>
+</html>

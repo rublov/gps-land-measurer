@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <title>🎯 Готовые решения для измерения земли</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .app-card {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .app-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        .app-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .app-desc {
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        .app-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: bold;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .app-link:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+        .accuracy-info {
+            background: #ff9800;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .calibration-info {
+            background: #9c27b0;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .apk-info {
+            background: #2196F3;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .command-box {
+            background: #2d2d2d;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .step-by-step {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-left: 4px solid #007acc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Приложения для измерения земельных участков</h1>
+        <p><strong>Статус:</strong> Все версии готовы! Выберите подходящую для ваших нужд.</p>
+
+        <div class="accuracy-info">
+            <h3>📍 Информация о точности GPS:</h3>
+            <ul>
+                <li><strong>Веб-версии:</strong> ±1000 метров (IP геолокация)</li>
+                <li><strong>React с калибровкой:</strong> Профессиональная точность с коррекцией</li>
+                <li><strong>Нативный APK:</strong> ±3-5 метров (максимальная точность)</li>
+            </ul>
+        </div>
+
+        <h2>🚀 Готовые приложения:</h2>
+
+        <div class="app-card">
+            <div class="app-title">1. 📱 Мобильная версия (Исправленная)</div>
+            <div class="app-desc">
+                Работает на всех устройствах. IP геолокация ±1000м. Ручной ввод координат. Расчет площади.
+            </div>
+            <a href="mobile-gps-fixed.html" class="app-link" target="_blank">Открыть приложение</a>
+        </div>
+
+        <div class="app-card">
+            <div class="app-title">2. 🏠 Полная React версия с калибровкой</div>
+            <div class="app-desc">
+                Профессиональная система калибровки. Множественные стратегии GPS. Сохранение измерений.
+            </div>
+            <a href="index.html" class="app-link" target="_blank">Открыть приложение</a>
+        </div>
+
+        <div class="app-card">
+            <div class="app-title">3. 📍 Простая мобильная версия</div>
+            <div class="app-desc">
+                Базовая версия для быстрых измерений. Простой интерфейс. IP геолокация.
+            </div>
+            <a href="mobile-gps-legacy.html" class="app-link" target="_blank">Открыть приложение</a>
+        </div>
+
+        <div class="calibration-info">
+            <h3>🎯 Как работает калибровка (React версия):</h3>
+            <ol>
+                <li>Найдите точку с известными координатами (угол участка, межевой знак)</li>
+                <li>Нажмите "Калибровка GPS"</li>
+                <li>Введите точные координаты этой точки</li>
+                <li>Система рассчитает поправку и будет автоматически её применять</li>
+                <li>Результат: точность до нескольких метров!</li>
+            </ol>
+        </div>
+
+        <div class="apk-info">
+            <h3>📲 Создание APK для максимальной точности</h3>
+            <p>Нативное Android приложение даёт точность ±3-5 метров вместо ±1000м в браузере.</p>
+            
+            <div class="step-by-step">
+                <h4>Быстрое создание APK:</h4>
+                
+                <div class="step">
+                    <strong>Шаг 1:</strong> Откройте PowerShell как администратор (Win+X)
+                </div>
+                
+                <div class="step">
+                    <strong>Шаг 2:</strong> Перейдите в папку проекта:
+                    <div class="command-box">cd "c:\Users\Зал Царства\dyad-apps\cozy-mongoose-slide"</div>
+                </div>
+                
+                <div class="step">
+                    <strong>Шаг 3:</strong> Выполните команды:
+                    <div class="command-box">
+npm run build<br>
+npx cap sync android<br>
+npx cap copy android<br>
+cd android<br>
+.\gradlew.bat assembleDebug
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <strong>Шаг 4:</strong> APK будет в папке:
+                    <div class="command-box">android\app\build\outputs\apk\debug\app-debug.apk</div>
+                </div>
+            </div>
+
+            <p><strong>Альтернатива:</strong> Установите Android Studio и откройте проект командой <code>npx cap open android</code></p>
+        </div>
+
+        <h2>🎯 Рекомендации по использованию:</h2>
+
+        <div class="step-by-step">
+            <div class="step">
+                <strong>Для быстрого тестирования:</strong> Используйте мобильную версию (mobile-gps-fixed.html)
+            </div>
+            
+            <div class="step">
+                <strong>Для профессиональной работы:</strong> React версия с калибровкой (index.html)
+            </div>
+            
+            <div class="step">
+                <strong>Для максимальной точности:</strong> Создайте APK и установите на телефон
+            </div>
+            
+            <div class="step">
+                <strong>Совет:</strong> Калибровка критически важна! Найдите точку с известными координатами для настройки.
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.1); border-radius: 8px;">
+            <h3>✅ Все готово для работы!</h3>
+            <p>Выберите подходящую версию и начните измерения. Для критически важной точности используйте калибровку или создайте APK.</p>
+        </div>
+    </div>
+</body>
+</html>

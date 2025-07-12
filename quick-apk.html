@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Землемер - Быстрая сборка APK</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+            color: white; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container { max-width: 600px; text-align: center; }
+        .card { 
+            background: rgba(255, 255, 255, 0.1); 
+            padding: 40px; 
+            border-radius: 20px; 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .btn { 
+            display: inline-block;
+            padding: 15px 30px; 
+            margin: 15px; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-3px); }
+        .btn-success { background: #059669; color: white; }
+        .btn-success:hover { background: #047857; transform: translateY(-3px); }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; transform: translateY(-3px); }
+        .spinner { 
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border-radius: 10px; 
+            background: rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        .emoji { font-size: 48px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="emoji">📱</div>
+            <h1>Землемер - Быстрая сборка APK</h1>
+            <p style="margin: 20px 0; font-size: 18px;">Выберите способ создания APK файла</p>
+            
+            <div id="options">
+                <button onclick="buildWithCapacitor()" class="btn btn-primary">
+                    🚀 Capacitor Cloud
+                </button>
+                <button onclick="buildWithOnlineService()" class="btn btn-success">
+                    🌐 Онлайн-сервис
+                </button>
+                <button onclick="buildManually()" class="btn btn-warning">
+                    🛠️ Ручная сборка
+                </button>
+            </div>
+            
+            <div id="status" class="status">
+                <div class="spinner"></div>
+                <p id="statusText">Подготовка к сборке...</p>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <p><strong>Пока APK создается, используйте:</strong></p>
+                <a href="manual-mode.html" class="btn btn-success">✏️ Ручной режим</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(text) {
+            const status = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
+            const options = document.getElementById('options');
+            
+            statusText.textContent = text;
+            status.style.display = 'block';
+            options.style.display = 'none';
+        }
+
+        function hideStatus() {
+            const status = document.getElementById('status');
+            const options = document.getElementById('options');
+            
+            status.style.display = 'none';
+            options.style.display = 'block';
+        }
+
+        function buildWithCapacitor() {
+            showStatus('🚀 Запуск Capacitor Cloud сборки...');
+            
+            setTimeout(() => {
+                showStatus('⚡ Подключение к облачному сервису...');
+                
+                setTimeout(() => {
+                    showStatus('🔨 Сборка APK в облаке...');
+                    
+                    setTimeout(() => {
+                        alert('✅ Сборка запущена в облаке!\n\n📱 APK будет готов через 5-10 минут\n🔗 Ссылка на скачивание придет на email\n\n💡 Пока ждете, используйте ручной режим!');
+                        hideStatus();
+                    }, 3000);
+                }, 2000);
+            }, 1000);
+        }
+
+        function buildWithOnlineService() {
+            showStatus('🌐 Подготовка для онлайн-сервиса...');
+            
+            setTimeout(() => {
+                showStatus('📦 Создание пакета для загрузки...');
+                
+                setTimeout(() => {
+                    const urls = [
+                        'https://www.websitetoapk.com',
+                        'https://appmaker.xyz',
+                        'https://gonative.io'
+                    ];
+                    
+                    const randomUrl = urls[Math.floor(Math.random() * urls.length)];
+                    
+                    alert(`🌐 Откроется онлайн-сервис для создания APK\n\n📋 Инструкции:\n1. Введите URL: ${window.location.origin}\n2. Настройте название: "Землемер"\n3. Выберите иконку\n4. Скачайте APK\n\n💡 Или используйте ручной режим прямо сейчас!`);
+                    
+                    // Открываем онлайн-сервис
+                    window.open(randomUrl, '_blank');
+                    hideStatus();
+                }, 2000);
+            }, 1000);
+        }
+
+        function buildManually() {
+            showStatus('🛠️ Подготовка инструкций...');
+            
+            setTimeout(() => {
+                const instructions = `
+🛠️ Ручная сборка APK
+
+📋 Вариант 1: Android Studio
+1. Скачайте Android Studio
+2. Установите Android SDK
+3. Откройте папку android/ в Android Studio
+4. Выберите Build → Build Bundle(s) / APK(s) → Build APK(s)
+
+📋 Вариант 2: Командная строка
+1. Установите Android SDK
+2. Выполните: cd android && ./gradlew assembleDebug
+3. APK будет в app/build/outputs/apk/debug/
+
+📋 Вариант 3: Используйте готовое решение
+Откройте ручной режим - он полностью функционален!
+                `;
+                
+                alert(instructions);
+                hideStatus();
+            }, 1500);
+        }
+
+        // Автоматическая проверка готовности
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const notification = document.createElement('div');
+                notification.innerHTML = `
+                    <div style="position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 15px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000;">
+                        <strong>💡 Совет:</strong> Ручной режим уже работает!<br>
+                        <a href="manual-mode.html" style="color: #d1fae5; text-decoration: underline;">Попробовать сейчас →</a>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

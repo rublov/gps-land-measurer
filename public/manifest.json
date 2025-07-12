@@ -1,0 +1,33 @@
+{
+  "name": "Землемер - GPS измерение участков",
+  "short_name": "Землемер",
+  "description": "Современное приложение для точного измерения площади земельных участков с помощью GPS",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "ru",
+  "categories": ["navigation", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/placeholder.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "permissions": [
+    "geolocation"
+  ],
+  "features": [
+    "cross-origin-isolated"
+  ]
+}

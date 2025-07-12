@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инструкции по созданию APK</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .step {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #007acc;
+        }
+        .command {
+            background: #2d2d2d;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #00b894;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Создание APK файла - Пошаговая инструкция</h1>
+
+    <div class="warning">
+        <strong>⚠️ Важно:</strong> APK файл нужен для получения максимальной точности GPS без ограничений браузера.
+    </div>
+
+    <h2>Метод 1: Автоматическое создание APK</h2>
+
+    <div class="step">
+        <h3>Шаг 1: Откройте PowerShell как администратор</h3>
+        <p>Нажмите Win+X и выберите "Windows PowerShell (администратор)"</p>
+    </div>
+
+    <div class="step">
+        <h3>Шаг 2: Перейдите в папку проекта</h3>
+        <div class="command">cd "c:\Users\Зал Царства\dyad-apps\cozy-mongoose-slide"</div>
+    </div>
+
+    <div class="step">
+        <h3>Шаг 3: Выполните команды по порядку</h3>
+        
+        <p><strong>Синхронизация:</strong></p>
+        <div class="command">npx cap sync android</div>
+        
+        <p><strong>Сборка проекта:</strong></p>
+        <div class="command">npm run build</div>
+        
+        <p><strong>Копирование файлов:</strong></p>
+        <div class="command">npx cap copy android</div>
+        
+        <p><strong>Создание APK:</strong></p>
+        <div class="command">cd android</div>
+        <div class="command">.\gradlew.bat assembleDebug</div>
+    </div>
+
+    <div class="step">
+        <h3>Шаг 4: Найдите готовый APK</h3>
+        <p>APK файл будет создан в папке:</p>
+        <div class="command">android\app\build\outputs\apk\debug\app-debug.apk</div>
+    </div>
+
+    <h2>Метод 2: Через Android Studio</h2>
+
+    <div class="step">
+        <h3>Шаг 1: Установите Android Studio</h3>
+        <p>Скачайте с официального сайта: <a href="https://developer.android.com/studio">developer.android.com/studio</a></p>
+    </div>
+
+    <div class="step">
+        <h3>Шаг 2: Откройте проект</h3>
+        <div class="command">npx cap open android</div>
+        <p>Или откройте папку android в Android Studio вручную</p>
+    </div>
+
+    <div class="step">
+        <h3>Шаг 3: Создайте APK</h3>
+        <p>В Android Studio: Build → Build Bundle(s) / APK(s) → Build APK(s)</p>
+    </div>
+
+    <h2>Что вы получите:</h2>
+
+    <div class="success">
+        <h3>✅ Возможности нативного APK:</h3>
+        <ul>
+            <li><strong>Высокая точность GPS</strong> - до ±3-5 метров (вместо ±1000м в браузере)</li>
+            <li><strong>Система калибровки</strong> - для профессиональной точности</li>
+            <li><strong>Без ограничений HTTPS</strong> - работает везде</li>
+            <li><strong>Полный доступ к GPS</strong> - все функции Android</li>
+            <li><strong>Оффлайн работа</strong> - не требует интернета</li>
+        </ul>
+    </div>
+
+    <h2>Если возникли проблемы:</h2>
+
+    <div class="step">
+        <h3>Проблема: Gradle не найден</h3>
+        <p><strong>Решение:</strong> Установите Android SDK или используйте Android Studio</p>
+    </div>
+
+    <div class="step">
+        <h3>Проблема: Команды не работают</h3>
+        <p><strong>Решение:</strong> Проверьте установку Node.js и Capacitor:</p>
+        <div class="command">npm install -g @capacitor/cli</div>
+    </div>
+
+    <div class="step">
+        <h3>Альтернатива: Используйте веб-версию</h3>
+        <p>Пока APK создается, можете использовать:</p>
+        <ul>
+            <li><a href="mobile-gps-fixed.html">Мобильная веб-версия</a> (IP геолокация ±1000м)</li>
+            <li><a href="index.html">Полная версия React</a> (с калибровкой)</li>
+        </ul>
+    </div>
+
+    <div class="warning">
+        <strong>💡 Совет:</strong> После создания APK, установите его на телефон и разрешите доступ к GPS для максимальной точности.
+    </div>
+
+</body>
+</html>
