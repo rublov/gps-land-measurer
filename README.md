@@ -21,6 +21,7 @@ pnpm install
 
 ### 2. Настройка Google Maps API
 ```bash
+ 
 # Получите API ключ: https://console.cloud.google.com/
 # Скопируйте .env.example в .env
 cp .env.example .env
