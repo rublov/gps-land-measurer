@@ -1,4 +1,25 @@
-# Logs
+# Исключаем лишние файлы и папки из репозитория
+node_modules/
+dist/
+.git/
+.vscode/
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.log
+android/app/build/
+android/.gradle/
+.env
+.DS_Store
+npm-debug.log
+pnpm-debug.log
+coverage/
+.idea/
+*.iml
+*.apk
+*.keystore# Logs
 logs
 *.log
 npm-debug.log*
