@@ -21,6 +21,12 @@ jobs:
         run: npm install -g pnpm
 
 
+      - name: Очистить кэш gradle
+        run: |
+          rm -rf ~/.gradle/caches
+          rm -rf ~/.gradle/wrapper
+        shell: bash
+
       - name: Copy .env.example to .env
         run: cp .env.example .env
 
